@@ -1,68 +1,42 @@
-from flask import Flask, render_template_string, request
+from flask import Flask, render_template, request
 from datetime import datetime
 from data_fetcher.zacks import get_zacks_rank
 from logic.rating import evaluate_rating
 
 app = Flask(__name__)
 
-# HTML-шаблон
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Індекс Скай</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 40px; }
-        input, button { padding: 6px; font-size: 14px; margin: 2px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-        th { background-color: #4CAF50; color: white; }
-    </style>
-</head>
-<body>
-    <h1>Індекс Скай — Масова Оцінка Акцій</h1>
-    <form method="POST">
-        <label>Кількість рядків: </label>
-        <input type="number" name="rows_count" min="1" max="50" value="{{ rows|length }}">
-        <button name="action" value="resize">Оновити</button>
-        <br><br>
-        <table>
-            <tr>
-                <th>Symbol</th>
-                {% for header in headers %}
-                    <th>{{ header }}</th>
-                {% endfor %}
-                <th>Оцінка</th>
-                <th>Дата</th>
-            </tr>
-            {% for i in range(rows|length) %}
-            <tr>
-                <td><input type="text" name="symbol_{{ i }}" value="{{ rows[i]['Symbol'] }}"></td>
-                {% for header in headers %}
-                    <td><input type="text" name="{{ header }}_{{ i }}" value="{{ rows[i][header] }}"></td>
-                {% endfor %}
-                <td>{{ rows[i]['Оцінка'] }}</td>
-                <td>{{ rows[i]['Дата'] }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <br>
-        <button name="action" value="parse">ПАРСІНГ</button>
-        <button name="action" value="evaluate">ОЦІНКА</button>
-    </form>
-</body>
-</html>
-"""
-
-# Заголовки метрик
+# Заголовки метрик у таблиці
 HEADERS = [
+    "Sector",
     "Zacks Rank",
     "Sector Growth",
     "EPS Growth",
     "Revenue Growth",
     "PE Ratio",
-    "Volume Change"
+    "Volume Change",
 ]
+
+# Варіанти секторів для випадаючого списку
+SECTOR_OPTIONS = [
+    "Technology",
+    "Financial Services",
+    "Healthcare",
+    "Communication Services",
+    "Consumer Cyclical",
+    "Consumer Defensive",
+    "Industrials",
+    "Basic Materials",
+    "Utilities",
+    "Real Estate",
+    "Energy",
+    "Broad Market",
+    "Bonds",
+    "Innovation",
+]
+
+def field_name(key: str) -> str:
+    """Перетворює назву стовпця на ім'я поля форми"""
+    return key.lower().replace(' ', '_')
 
 def empty_row():
     return {
@@ -105,18 +79,21 @@ def index():
             symbol = request.form.get(f'symbol_{i}', '').upper()
             rows[i]['Symbol'] = symbol
 
+            # Завантажити поточні значення з форми
+            for key in HEADERS:
+                form_key = f"{field_name(key)}_{i}"
+                rows[i][key] = request.form.get(form_key, '')
+
             if action == "parse" and symbol:
                 parsed = parse_data(symbol)
-                for key in HEADERS:
-                    rows[i][key] = parsed.get(key, '')
+                for key, value in parsed.items():
+                    rows[i][key] = value
                 rows[i]['Дата'] = datetime.today().strftime('%Y-%m-%d')
             elif action == "evaluate":
-                for key in HEADERS:
-                    rows[i][key] = request.form.get(f'{key}_{i}', '')
                 rows[i]['Оцінка'] = evaluate_rating(rows[i])
                 rows[i]['Дата'] = datetime.today().strftime('%Y-%m-%d')
 
-    return render_template_string(HTML_TEMPLATE, headers=HEADERS, rows=rows)
+    return render_template('index.html', headers=HEADERS, rows=rows, sectors=SECTOR_OPTIONS)
 
 if __name__ == '__main__':
     app.run(debug=True)
