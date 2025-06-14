@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>SKY INDEX</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 4px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        input, select { width: 110px; padding: 4px; font-size: 14px; }
+        button { padding: 6px; font-size: 14px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <h1>SKY INDEX 💰🤩</h1>
+    <form method="POST">
+        <label>Кількість рядків: </label>
+        <input type="number" name="rows_count" min="1" max="50" value="{{ rows|length }}">
+        <button name="action" value="resize">Оновити</button>
+        <table>
+            <thead>
+                <tr>
+                    <th title="Символ акції">Symbol</th>
+                    <th>Sector</th>
+                    <th title="Рейтинг Zacks">Zacks Rank</th>
+                    <th title="Зростання сектору">Sector Growth</th>
+                    <th>EPS Growth</th>
+                    <th>Revenue Growth</th>
+                    <th>PE Ratio</th>
+                    <th>Volume Change</th>
+                    <th>Оцінка</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i, row in enumerate(rows) %}
+                <tr>
+                    <td><input type="text" name="symbol_{{ i }}" value="{{ row['Symbol'] }}"></td>
+                    <td>
+                        <select name="sector_{{ i }}">
+                            <option value=""></option>
+                            {% for opt in sectors %}
+                            <option value="{{ opt }}" {% if row['Sector'] == opt %}selected{% endif %}>{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="text" name="zacks_rank_{{ i }}" value="{{ row['Zacks Rank'] }}"></td>
+                    <td><input type="text" name="sector_growth_{{ i }}" value="{{ row['Sector Growth'] }}"></td>
+                    <td><input type="text" name="eps_growth_{{ i }}" value="{{ row['EPS Growth'] }}"></td>
+                    <td><input type="text" name="revenue_growth_{{ i }}" value="{{ row['Revenue Growth'] }}"></td>
+                    <td><input type="text" name="pe_ratio_{{ i }}" value="{{ row['PE Ratio'] }}"></td>
+                    <td><input type="text" name="volume_change_{{ i }}" value="{{ row['Volume Change'] }}"></td>
+                    <td>{{ row['Оцінка'] }}</td>
+                    <td>{{ row['Дата'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button name="action" value="parse">Парсинг</button>
+        <button name="action" value="evaluate">Оцінка</button>
+        <button name="action" value="save">Зберегти</button>
+    </form>
+</body>
+</html>
