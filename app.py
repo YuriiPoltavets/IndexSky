@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Заголовки метрик у таблиці
 HEADERS = [
     "Sector",
-    "Zacks Rank",
+    "Zacks",
     "Sector Growth",
     "EPS Growth",
     "Revenue Growth",
@@ -62,7 +62,7 @@ def parse_data(symbol):
         sector = ""
     return {
         "Sector": sector if sector else "",
-        "Zacks Rank": rank,
+        "Zacks": rank,
         "Sector Growth": "",
         "EPS Growth": "",
         "Revenue Growth": "",
@@ -106,6 +106,7 @@ def index():
             elif action == "save":
                 if symbol and rows[i].get('Sector'):
                     add_sector(symbol, rows[i]['Sector'])
+                    rows[i]["Дата"] = datetime.today().strftime('%Y-%m-%d')
 
     return render_template('index.html', headers=HEADERS, rows=rows, sectors=SECTOR_OPTIONS)
 

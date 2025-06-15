@@ -1,9 +1,9 @@
 def evaluate_rating(data):
     score = 0
 
-    # Zacks Rank: +1 бал, якщо 1 або 2 (Strong Buy / Buy)
+    # Zacks: +1 бал, якщо 1 або 2 (Strong Buy / Buy)
     try:
-        if int(data.get("Zacks Rank", 0)) <= 2:
+        if int(data.get("Zacks", 0)) <= 2:
             score += 1
     except:
         pass
