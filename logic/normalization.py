@@ -90,6 +90,10 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         'volume_change_norm': volume_change_norm,
     }
 
+    # If all normalized values are None → treat row as invalid
+    if all(v is None for v in metrics.values()):
+        return None
+
     return {
         'symbol': symbol,
         'date': date_str,
