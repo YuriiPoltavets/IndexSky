@@ -41,7 +41,7 @@
             font-size: 13px;
         }
         .zacks-output {
-            width: 55px; /* збільшено */
+            width: 55px;
         }
         .sector-growth {
             width: 110px;
@@ -120,7 +120,7 @@
                     {% for row in rows %}
                     {% set i = loop.index0 %}
                     <tr data-row-id="{{ i }}" data-status="">
-                        <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}"></td>
+                        <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
                         <td>
                             <select name="sector_{{ i }}" class="sector-select">
                                 <option value=""></option>
