@@ -79,6 +79,8 @@
             font-size: 14px;
             margin: 2px;
         }
+        .row-ok { background-color: #d4edda; }
+        .row-error { background-color: #f8d7da; }
         .row-control {
             display: flex;
             align-items: center;
@@ -117,7 +119,7 @@
                 <tbody>
                     {% for row in rows %}
                     {% set i = loop.index0 %}
-                    <tr>
+                    <tr data-row-id="{{ i }}" data-status="">
                         <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}"></td>
                         <td>
                             <select name="sector_{{ i }}" class="sector-select">
@@ -134,7 +136,7 @@
                         <td><input type="text" class="pe-ratio" name="pe_ratio_{{ i }}" value="{{ row['PE Ratio'] }}"></td>
                         <td><input type="text" class="volume-change" name="volume_change_{{ i }}" value="{{ row['Volume Change'] }}"></td>
                         <td style="width: 60px;">{{ row['Оцінка'] }}</td>
-                        <td style="width: 90px;">{{ row['Дата'] }}</td>
+                        <td class="date-cell" style="width: 90px;">{{ row['Дата'] }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -144,7 +146,8 @@
         <br>
         <button name="action" value="parse">Парсинг</button>
         <button name="action" value="evaluate">Оцінка</button>
-        <button name="action" value="save">Зберегти</button>
+        <button type="button" onclick="handleSave()">Зберегти</button>
     </form>
+    <script src="{{ url_for('static', filename='save.js') }}"></script>
 </body>
 </html>
