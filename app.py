@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from data_fetcher.zacks import get_zacks_rank
 from logic.rating import evaluate_rating
 from sector_manager import get_sector_from_cache, add_sector
 from data_fetcher.yfinance_data import get_sector_yf
+from logic.normalization import normalize_row
+from logic.save_handler import save_row
 
 app = Flask(__name__)
 
@@ -69,6 +71,37 @@ def parse_data(symbol):
         "PE Ratio": "",
         "Volume Change": ""
     }
+
+
+@app.route("/save", methods=["POST"])
+def save_data():
+    """Normalize and save rows of stock data from JSON."""
+    try:
+        payload = request.get_json(force=True)
+    except Exception:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    if not isinstance(payload, list):
+        return jsonify({"error": "Expected list of rows"}), 400
+
+    results = []
+    for row in payload:
+        if not isinstance(row, dict):
+            results.append({"symbol": None, "status": "error", "reason": "invalid row format"})
+            continue
+
+        symbol = row.get("symbol") or row.get("Symbol")
+        if isinstance(symbol, str):
+            symbol = symbol.strip().upper() or None
+
+        normalized = normalize_row(row)
+        if normalized is None:
+            results.append({"symbol": symbol, "status": "error", "reason": "invalid input"})
+            continue
+
+        results.append(save_row(normalized))
+
+    return jsonify(results)
 
 
 @app.route('/', methods=['GET', 'POST'])
