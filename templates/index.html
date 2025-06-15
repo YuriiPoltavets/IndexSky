@@ -6,9 +6,25 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 20px; }
         table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 4px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 2px; text-align: left; }
         th { background-color: #4CAF50; color: white; }
-        input, select { width: 110px; padding: 4px; font-size: 14px; }
+        input, select { width: 100%; min-width: 110px; padding: 4px; font-size: 14px; box-sizing: border-box; }
+        .symbol-input { width: 99px; }
+        .sector-select { width: 121px; }
+        .zacks-output { width: 35px; }
+        th[title] { position: relative; }
+        th[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: #333;
+            color: #fff;
+            padding: 2px 4px;
+            white-space: nowrap;
+            border-radius: 3px;
+            font-size: 12px;
+        }
         button { padding: 6px; font-size: 14px; margin: 2px; }
     </style>
 </head>
@@ -21,32 +37,32 @@
         <table>
             <thead>
                 <tr>
-                    <th title="Символ акції">Symbol</th>
-                    <th>Sector</th>
-                    <th title="Рейтинг Zacks">Zacks Rank</th>
-                    <th title="Зростання сектору">Sector Growth</th>
-                    <th>EPS Growth</th>
-                    <th>Revenue Growth</th>
-                    <th>PE Ratio</th>
-                    <th>Volume Change</th>
-                    <th>Оцінка</th>
-                    <th>Дата</th>
+                    <th title="Біржовий тикер акції або ETF">Symbol</th>
+                    <th title="Галузь, до якої належить компанія">Sector</th>
+                    <th title="Рейтинг Zacks від 1 (сильна покупка) до 5 (продаж)">Zacks</th>
+                    <th title="Зміна ціни галузевого ETF за певний період">Sector Growth</th>
+                    <th title="Ріст прибутку на акцію за рік або квартал">EPS Growth</th>
+                    <th title="Зростання виручки компанії">Revenue Growth</th>
+                    <th title="Співвідношення ціни до прибутку">PE Ratio</th>
+                    <th title="Зміна обсягу торгів за добу">Volume Change</th>
+                    <th title="Підсумкова оцінка моделі">Оцінка</th>
+                    <th title="Дата, на яку зібрані ці дані">Дата</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in rows %}
                 {% set i = loop.index0 %}
                 <tr>
-                    <td><input type="text" name="symbol_{{ i }}" value="{{ row['Symbol'] }}"></td>
+                    <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}"></td>
                     <td>
-                        <select name="sector_{{ i }}">
+                        <select name="sector_{{ i }}" class="sector-select">
                             <option value=""></option>
                             {% for opt in sectors %}
                                 <option value="{{ opt }}" {% if row['Sector'] == opt %}selected{% endif %}>{{ opt }}</option>
                             {% endfor %}
                         </select>
                     </td>
-                    <td><input type="text" name="zacks_rank_{{ i }}" value="{{ row['Zacks Rank'] }}"></td>
+                    <td><input type="text" class="zacks-output" name="zacks_{{ i }}" value="{{ row['Zacks'] }}"></td>
                     <td><input type="text" name="sector_growth_{{ i }}" value="{{ row['Sector Growth'] }}"></td>
                     <td><input type="text" name="eps_growth_{{ i }}" value="{{ row['EPS Growth'] }}"></td>
                     <td><input type="text" name="revenue_growth_{{ i }}" value="{{ row['Revenue Growth'] }}"></td>
