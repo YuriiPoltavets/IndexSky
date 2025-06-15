@@ -2,6 +2,8 @@ from flask import Flask, render_template, request
 from datetime import datetime
 from data_fetcher.zacks import get_zacks_rank
 from logic.rating import evaluate_rating
+from sector_manager import get_sector_from_cache, add_sector
+from data_fetcher.yfinance_data import get_sector_yf
 
 app = Flask(__name__)
 
@@ -50,7 +52,16 @@ def parse_data(symbol):
     if not symbol:
         return {}
     rank = get_zacks_rank(symbol)
+    sector = get_sector_from_cache(symbol)
+    if sector is None:
+        try:
+            sector = get_sector_yf(symbol)
+        except Exception:
+            sector = ""
+    if not isinstance(sector, str):
+        sector = ""
     return {
+        "Sector": sector if sector else "",
         "Zacks Rank": rank,
         "Sector Growth": "",
         "EPS Growth": "",
@@ -92,6 +103,9 @@ def index():
             elif action == "evaluate":
                 rows[i]['Оцінка'] = evaluate_rating(rows[i])
                 rows[i]['Дата'] = datetime.today().strftime('%Y-%m-%d')
+            elif action == "save":
+                if symbol and rows[i].get('Sector'):
+                    add_sector(symbol, rows[i]['Sector'])
 
     return render_template('index.html', headers=HEADERS, rows=rows, sectors=SECTOR_OPTIONS)
 
