@@ -4,7 +4,7 @@ import time
 import random
 
 def get_zacks_rank(symbol):
-    time.sleep(random.uniform(1.0, 2.2))  # антиспам-затримка
+    time.sleep(random.uniform(0.1, 1.0))  # антиспам-затримка
 
     urls = [
         f"https://www.zacks.com/stock/quote/{symbol}?q={symbol}",
