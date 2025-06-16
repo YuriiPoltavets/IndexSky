@@ -22,19 +22,16 @@ HEADERS = [
 # Варіанти секторів для випадаючого списку
 SECTOR_OPTIONS = [
     "Technology",
-    "Financial Services",
+    "Financials",
     "Healthcare",
     "Communication Services",
-    "Consumer Cyclical",
-    "Consumer Defensive",
+    "Consumer Discretionary",
+    "Consumer Staples",
     "Industrials",
-    "Basic Materials",
+    "Materials",
+    "Energy",
     "Utilities",
     "Real Estate",
-    "Energy",
-    "Broad Market",
-    "Bonds",
-    "Innovation",
 ]
 
 def field_name(key: str) -> str:
