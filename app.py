@@ -99,9 +99,14 @@ def save_data():
 
         # Sector is required if symbol is provided
         sector = row.get("Sector") or row.get("sector")
-        if symbol and not (isinstance(sector, str) and sector.strip()):
+        if isinstance(sector, str):
+            sector = sector.strip()
+        if symbol and not sector:
             results.append({"symbol": symbol, "status": "error", "reason": "Missing sector", "field": "Sector"})
             continue
+
+        if symbol and sector:
+            add_sector(symbol, sector)
 
         normalized = normalize_row(row)
         if normalized is None:
