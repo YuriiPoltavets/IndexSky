@@ -51,3 +51,8 @@ def load_sector_growth() -> bool:
 def get_sector_growth(sector: str) -> str:
     """Return the 1-day growth percentage for the given sector."""
     return SECTOR_GROWTH_CACHE.get(sector, {}).get("1d", "")
+
+
+def get_sector_growth_data(sector: str) -> dict[str, str]:
+    """Return cached growth metrics dictionary for the given sector."""
+    return SECTOR_GROWTH_CACHE.get(sector, {})

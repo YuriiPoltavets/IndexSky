@@ -1,4 +1,5 @@
 import datetime
+import math
 from typing import Any, Dict, Optional
 
 from .rating import calculate_skyindex_score
@@ -24,6 +25,23 @@ def _parse_float(value: Any) -> Optional[float]:
 
 def _clamp(value: float, min_val: float = -1.0, max_val: float = 1.0) -> float:
     return max(min_val, min(max_val, value))
+
+
+def _tanh_percent(value: Any, scale: float) -> Optional[float]:
+    """Return tanh-normalized percentage value.
+
+    ``value`` may contain a string with a trailing ``%``. The numeric
+    component is divided by 100 and then by ``scale`` before applying
+    ``math.tanh``. The result is clamped to [-1, 1].
+    """
+    val = _parse_float(value)
+    if val is None:
+        return None
+    try:
+        normalized = math.tanh((val / 100.0) / scale)
+    except Exception:
+        return None
+    return _clamp(normalized)
 
 
 def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -78,7 +96,16 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             return _clamp(val / 100)
         return None
 
-    sector_growth_norm = percent_norm('sector_growth', 'Sector Growth')
+    sector_growth_1d_norm = _tanh_percent(
+        _get_value(row, 'sector_growth_1d', 'Sector Growth 1d'), 0.03
+    )
+    sector_growth_3d_norm = _tanh_percent(
+        _get_value(row, 'sector_growth_3d', 'Sector Growth 3d'), 0.06
+    )
+    sector_growth_7d_norm = _tanh_percent(
+        _get_value(row, 'sector_growth_7d', 'Sector Growth 7d'), 0.10
+    )
+
     eps_growth_norm = percent_norm('eps_growth', 'EPS Growth')
     revenue_growth_norm = percent_norm('revenue_growth', 'Revenue Growth')
     volume_change_norm = percent_norm('volume_change', 'Volume Change')
@@ -86,7 +113,9 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     metrics = {
         'zacks_rank_norm': zacks_norm,
         'pe_ratio_norm': pe_norm,
-        'sector_growth_norm': sector_growth_norm,
+        'sector_growth_1d_norm': sector_growth_1d_norm,
+        'sector_growth_3d_norm': sector_growth_3d_norm,
+        'sector_growth_7d_norm': sector_growth_7d_norm,
         'eps_growth_norm': eps_growth_norm,
         'revenue_growth_norm': revenue_growth_norm,
         'volume_change_norm': volume_change_norm,

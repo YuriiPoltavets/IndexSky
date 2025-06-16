@@ -5,7 +5,11 @@ from sector_manager import get_sector_from_cache, add_sector
 from data_fetcher.yfinance_data import get_sector_yf
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
-from sector_growth_cache import load_sector_growth, get_sector_growth
+from sector_growth_cache import (
+    load_sector_growth,
+    get_sector_growth,
+    get_sector_growth_data,
+)
 
 # Prefetch sector growth metrics on startup
 sector_growth_loaded = load_sector_growth()
@@ -47,7 +51,8 @@ def empty_row():
         "Symbol": "",
         **{key: "" for key in HEADERS},
         "skyindex_score": None,
-        "Дата": ""
+        "Дата": "",
+        "row_class": ""
     }
 
 def parse_data(symbol):
@@ -157,6 +162,47 @@ def index():
                 if symbol and rows[i].get('Sector'):
                     add_sector(symbol, rows[i]['Sector'])
                     rows[i]["Дата"] = datetime.today().strftime('%Y-%m-%d')
+            elif action == "calculate":
+                if not symbol:
+                    continue
+
+                sector = rows[i].get("Sector", "")
+                sector_growth = rows[i].get("Sector Growth", "")
+
+                if sector and not sector_growth:
+                    rows[i]["Sector Growth"] = get_sector_growth(sector)
+                sg_data = get_sector_growth_data(sector) if sector else {}
+                sg1 = rows[i]["Sector Growth"]
+                sg3 = sg_data.get("3d", "")
+                sg7 = sg_data.get("7d", "")
+
+                row_data = {
+                    "Symbol": symbol,
+                    "Sector": sector,
+                    "Zacks": rows[i].get("Zacks"),
+                    "Sector Growth 1d": sg1,
+                    "Sector Growth 3d": sg3,
+                    "Sector Growth 7d": sg7,
+                    "EPS Growth": rows[i].get("EPS Growth"),
+                    "Revenue Growth": rows[i].get("Revenue Growth"),
+                    "PE Ratio": rows[i].get("PE Ratio"),
+                    "Volume Change": rows[i].get("Volume Change"),
+                    "Дата": datetime.today().strftime('%Y-%m-%d'),
+                }
+
+                normalized = normalize_row(row_data)
+                if normalized is None:
+                    rows[i]["row_class"] = "row-error"
+                    continue
+
+                save_res = save_row(normalized)
+                rows[i]["skyindex_score"] = normalized.get("skyindex_score")
+                rows[i]["Дата"] = normalized.get("date")
+
+                if save_res.get("status") == "ok":
+                    rows[i]["row_class"] = "row-ok"
+                else:
+                    rows[i]["row_class"] = "row-error"
 
     return render_template('index.html', headers=HEADERS, rows=rows, sectors=SECTOR_OPTIONS,
                            sector_growth_loaded=sector_growth_loaded)
