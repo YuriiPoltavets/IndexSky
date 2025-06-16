@@ -33,6 +33,10 @@ async function handleSave() {
             const tr = Array.from(document.querySelectorAll('tbody tr'))
                 .find(r => r.querySelector('.symbol-input')?.value.trim().toUpperCase() === symbol);
             if (!tr) return;
+
+            const sectorEl = tr.querySelector('.sector-select');
+            if (sectorEl) sectorEl.dataset.status = '';
+
             if (res.status === 'ok') {
                 tr.dataset.status = 'ok';
                 tr.classList.remove('row-error');
@@ -42,9 +46,11 @@ async function handleSave() {
                 tr.dataset.status = 'error';
                 tr.classList.remove('row-ok');
                 tr.classList.add('row-error');
+                if (res.field === 'Sector' && sectorEl) {
+                    sectorEl.dataset.status = 'error';
+                }
                 if (res.reason) {
                     tr.title = res.reason;
-                    alert(symbol + ': ' + res.reason);
                 }
             }
         });

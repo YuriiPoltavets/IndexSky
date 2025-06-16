@@ -93,6 +93,16 @@ def save_data():
         if isinstance(symbol, str):
             symbol = symbol.strip().upper() or None
 
+        # Skip completely blank rows (no symbol and no data)
+        if not symbol and all(not str(row.get(key, '')).strip() for key in HEADERS):
+            continue
+
+        # Sector is required if symbol is provided
+        sector = row.get("Sector") or row.get("sector")
+        if symbol and not (isinstance(sector, str) and sector.strip()):
+            results.append({"symbol": symbol, "status": "error", "reason": "Missing sector", "field": "Sector"})
+            continue
+
         normalized = normalize_row(row)
         if normalized is None:
             results.append({"symbol": symbol, "status": "error", "reason": "invalid input"})
