@@ -100,6 +100,6 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         'metrics': metrics,
         'open_price': None,
         'close_price': None,
-        'price_change_next_day': None,
+        'price_change_today': None,
         'price_at_parse': None,
     }
