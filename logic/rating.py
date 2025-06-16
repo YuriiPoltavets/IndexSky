@@ -1,3 +1,6 @@
+from typing import Any, Dict, Optional
+
+
 def evaluate_rating(data):
     score = 0
 
@@ -20,3 +23,12 @@ def evaluate_rating(data):
         score += 1
 
     return f"{score}/3"
+
+
+def calculate_skyindex_score(metrics: Dict[str, Any]) -> Optional[float]:
+    """Returns the normalized Zacks Rank as the skyindex_score."""
+    value = metrics.get("zacks_rank_norm")
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None

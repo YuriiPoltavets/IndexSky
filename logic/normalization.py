@@ -1,6 +1,8 @@
 import datetime
 from typing import Any, Dict, Optional
 
+from .rating import calculate_skyindex_score
+
 
 def _get_value(data: Dict[str, Any], *keys: str) -> Optional[str]:
     """Return first matching key from data in case-insensitive manner."""
@@ -94,6 +96,8 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if all(v is None for v in metrics.values()):
         return None
 
+    skyindex_score = calculate_skyindex_score(metrics)
+
     return {
         'symbol': symbol,
         'date': date_str,
@@ -102,4 +106,5 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         'close_price': None,
         'price_change_today': None,
         'price_at_parse': None,
+        'skyindex_score': skyindex_score,
     }

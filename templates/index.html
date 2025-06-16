@@ -112,7 +112,7 @@
                         <th data-tooltip="Зростання виручки компанії">Revenue Growth</th>
                         <th data-tooltip="Співвідношення ціни до прибутку">PE Ratio</th>
                         <th data-tooltip="Зміна обсягу торгів за добу">Volume Change</th>
-                        <th data-tooltip="Підсумкова оцінка моделі">Оцінка</th>
+                        <th data-tooltip="Підсумкова оцінка моделі">SkyIndex</th>
                         <th data-tooltip="Дата, на яку зібрані ці дані">Дата</th>
                     </tr>
                 </thead>
@@ -135,7 +135,11 @@
                         <td><input type="text" class="revenue-growth" name="revenue_growth_{{ i }}" value="{{ row['Revenue Growth'] }}"></td>
                         <td><input type="text" class="pe-ratio" name="pe_ratio_{{ i }}" value="{{ row['PE Ratio'] }}"></td>
                         <td><input type="text" class="volume-change" name="volume_change_{{ i }}" value="{{ row['Volume Change'] }}"></td>
-                        <td style="width: 60px;">{{ row['Оцінка'] }}</td>
+                        <td style="width: 60px;">
+                            {% if row['skyindex_score'] is not none %}
+                                {{ '%.2f'|format(row['skyindex_score']) }}
+                            {% endif %}
+                        </td>
                         <td class="date-cell" style="width: 90px;">{{ row['Дата'] }}</td>
                     </tr>
                     {% endfor %}
@@ -145,7 +149,6 @@
 
         <br>
         <button name="action" value="parse">Парсинг</button>
-        <button name="action" value="evaluate">Оцінка</button>
         <button type="button" onclick="handleSave()">Зберегти</button>
     </form>
     <script src="{{ url_for('static', filename='save.js') }}"></script>

@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS stock_metrics (
   close_price REAL,
   price_change_today REAL,
   price_at_parse REAL,
+  skyindex_score REAL,
   metrics TEXT,
   UNIQUE(symbol, date)
 );
@@ -38,13 +39,14 @@ def save_row(row: Dict[str, Any]) -> Dict[str, Any]:
 
             sql = (
                 "INSERT INTO stock_metrics (symbol, date, open_price, close_price, "
-                "price_change_today, price_at_parse, metrics) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?) "
+                "price_change_today, price_at_parse, skyindex_score, metrics) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
                 "ON CONFLICT(symbol, date) DO UPDATE SET "
                 "open_price=excluded.open_price, "
                 "close_price=excluded.close_price, "
                 "price_change_today=excluded.price_change_today, "
                 "price_at_parse=excluded.price_at_parse, "
+                "skyindex_score=excluded.skyindex_score, "
                 "metrics=excluded.metrics"
             )
 
@@ -57,6 +59,7 @@ def save_row(row: Dict[str, Any]) -> Dict[str, Any]:
                     row.get("close_price"),
                     row.get("price_change_today"),
                     row.get("price_at_parse"),
+                    row.get("skyindex_score"),
                     json.dumps(metrics),
                 ),
             )
