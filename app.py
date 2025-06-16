@@ -5,7 +5,7 @@ from sector_manager import get_sector_from_cache, add_sector
 from data_fetcher.yfinance_data import get_sector_yf
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
-from sector_growth_cache import load_sector_growth
+from sector_growth_cache import load_sector_growth, get_sector_growth
 
 # Prefetch sector growth metrics on startup
 sector_growth_loaded = load_sector_growth()
@@ -147,7 +147,12 @@ def index():
                 parsed = parse_data(symbol)
                 for key, value in parsed.items():
                     rows[i][key] = value
-                rows[i]['Дата'] = datetime.today().strftime('%Y-%m-%d')
+
+                sector = rows[i].get("Sector")
+                if sector:
+                    rows[i]["Sector Growth"] = get_sector_growth(sector)
+
+                rows[i]["Дата"] = datetime.today().strftime('%Y-%m-%d')
             elif action == "save":
                 if symbol and rows[i].get('Sector'):
                     add_sector(symbol, rows[i]['Sector'])
