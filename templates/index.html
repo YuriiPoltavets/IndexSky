@@ -92,6 +92,8 @@
         .row-control input[type="number"] {
             width: 60px;
         }
+        .status.success { color: green; font-weight: bold; }
+        .status.error { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -153,6 +155,11 @@
         <br>
         <button name="action" value="parse">Парсинг</button>
         <button type="button" onclick="handleSave()">Зберегти</button>
+        {% if sector_growth_loaded %}
+          <div class="status success">✅ Sector Growth loaded</div>
+        {% else %}
+          <div class="status error">⚠️ Sector Growth failed</div>
+        {% endif %}
     </form>
     <script src="{{ url_for('static', filename='save.js') }}"></script>
 </body>

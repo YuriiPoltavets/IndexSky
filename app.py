@@ -5,6 +5,10 @@ from sector_manager import get_sector_from_cache, add_sector
 from data_fetcher.yfinance_data import get_sector_yf
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
+from sector_growth_cache import load_sector_growth
+
+# Prefetch sector growth metrics on startup
+sector_growth_loaded = load_sector_growth()
 
 app = Flask(__name__)
 
@@ -149,7 +153,8 @@ def index():
                     add_sector(symbol, rows[i]['Sector'])
                     rows[i]["Дата"] = datetime.today().strftime('%Y-%m-%d')
 
-    return render_template('index.html', headers=HEADERS, rows=rows, sectors=SECTOR_OPTIONS)
+    return render_template('index.html', headers=HEADERS, rows=rows, sectors=SECTOR_OPTIONS,
+                           sector_growth_loaded=sector_growth_loaded)
 
 if __name__ == '__main__':
     app.run(debug=True)
