@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS stock_metrics (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol TEXT,
     zacks_rank_norm REAL,
+    skyindex_score REAL,
     date TEXT
 );
 """

@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from data_fetcher.zacks import get_zacks_rank
-from logic.rating import evaluate_rating
 from sector_manager import get_sector_from_cache, add_sector
 from data_fetcher.yfinance_data import get_sector_yf
 from logic.normalization import normalize_row
@@ -46,7 +45,7 @@ def empty_row():
     return {
         "Symbol": "",
         **{key: "" for key in HEADERS},
-        "Оцінка": "-",
+        "skyindex_score": None,
         "Дата": ""
     }
 
@@ -132,9 +131,6 @@ def index():
                 parsed = parse_data(symbol)
                 for key, value in parsed.items():
                     rows[i][key] = value
-                rows[i]['Дата'] = datetime.today().strftime('%Y-%m-%d')
-            elif action == "evaluate":
-                rows[i]['Оцінка'] = evaluate_rating(rows[i])
                 rows[i]['Дата'] = datetime.today().strftime('%Y-%m-%d')
             elif action == "save":
                 if symbol and rows[i].get('Sector'):
