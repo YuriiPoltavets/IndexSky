@@ -124,7 +124,7 @@
                 <tbody>
                     {% for row in rows %}
                     {% set i = loop.index0 %}
-                    <tr data-row-id="{{ i }}" data-status="">
+                    <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="">
                         <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
                         <td>
                             <select name="sector_{{ i }}" class="sector-select">
@@ -154,7 +154,7 @@
 
         <br>
         <button name="action" value="parse">Data Search</button>
-        <button type="button" onclick="handleSave()">Зберегти</button>
+        <button name="action" value="calculate">Calculate</button>
         {% if sector_growth_loaded %}
           <div class="status success">✅ Sector Growth loaded</div>
         {% else %}
