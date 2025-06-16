@@ -126,7 +126,7 @@
                         <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
                         <td>
                             <select name="sector_{{ i }}" class="sector-select">
-                                <option value=""></option>
+                                <option value="">-</option>
                                 {% for opt in sectors %}
                                     <option value="{{ opt }}" {% if row['Sector'] == opt %}selected{% endif %}>{{ opt }}</option>
                                 {% endfor %}
