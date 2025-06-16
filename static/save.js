@@ -59,3 +59,12 @@ async function handleSave() {
         alert('Failed to save data');
     }
 }
+
+// Remove error highlighting from sector dropdowns once a valid value is chosen
+document.querySelectorAll('.sector-select').forEach(sel => {
+    sel.addEventListener('change', () => {
+        if (sel.value.trim() !== '') {
+            sel.removeAttribute('data-status');
+        }
+    });
+});
