@@ -3,23 +3,10 @@ import sqlite3
 from typing import Any, Dict
 
 from database.database import DB_PATH
+from database.schema import stock_metrics_schema
 
 
-TABLE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS stock_metrics (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  symbol TEXT,
-  date TEXT,
-  open_price REAL,
-  close_price REAL,
-  price_change_today REAL,
-  price_at_parse REAL,
-  skyindex_score REAL,
-  metrics TEXT,
-  is_etf INTEGER DEFAULT NULL,
-  UNIQUE(symbol, date)
-);
-"""
+TABLE_SCHEMA = stock_metrics_schema
 
 
 def save_row(row: Dict[str, Any]) -> Dict[str, Any]:
