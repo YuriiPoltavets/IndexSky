@@ -45,7 +45,12 @@ def get_sector_from_cache(symbol: str) -> Optional[str]:
 
 
 def add_sector(symbol: str, sector: str) -> None:
-    """Add or update a symbol to sector mapping and persist it."""
+    """Add a new symbol-to-sector mapping and persist it.
+
+    Existing mappings are left untouched so we don't accidentally
+    overwrite a user-provided sector.
+    """
     data = load_custom_sectors()
-    data[symbol] = sector
-    save_custom_sectors(data)
+    if symbol not in data:
+        data[symbol] = sector
+        save_custom_sectors(data)
