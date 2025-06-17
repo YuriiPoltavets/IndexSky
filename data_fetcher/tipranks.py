@@ -43,21 +43,32 @@ def fetch_tipranks_data(symbol: str) -> Optional[Dict]:
 
     try:
         resp = requests.get(url, headers=headers, timeout=10)
+        print("\u2705 TipRanks response:", resp.status_code)
         if resp.status_code != 200:
             return None
 
         soup = BeautifulSoup(resp.text, "html.parser")
+        print("\ud83d\udd0d Found", len(soup.find_all("script")), "scripts")
         script = None
         for tag in soup.find_all("script"):
             content = tag.string or tag.text
+            if content and "smartScore" in content:
+                print("\ud83d\udcdd script snippet:", content[:200])
             if content and "\"_meta\"" in content and "\"stocks\"" in content:
                 script = content
                 break
 
         if not script:
+            print(f"\u26a0\ufe0f TipRanks: smartScore script not found for {symbol}")
             return None
 
         data = json.loads(script)
+        print(
+            "\ud83d\udce6 Parsed JSON type:",
+            type(data),
+            "keys:",
+            list(data.keys()) if isinstance(data, dict) else None,
+        )
 
         smart_score = None
         for val in _find_in_dict(data, "smartScore"):
