@@ -103,20 +103,19 @@ def save_data():
         if not symbol and all(not str(row.get(key, '')).strip() for key in HEADERS):
             continue
 
-        # Sector is required if symbol is provided
         sector = row.get("Sector") or row.get("sector")
         if isinstance(sector, str):
             sector = sector.strip()
-        if symbol and not sector:
-            results.append({"symbol": symbol, "status": "error", "reason": "Missing sector", "field": "Sector"})
-            continue
-
         if symbol and sector:
             add_sector(symbol, sector)
 
         normalized = normalize_row(row)
         if normalized is None:
-            results.append({"symbol": symbol, "status": "error", "reason": "invalid input"})
+            results.append({
+                "symbol": symbol,
+                "status": "error",
+                "reason": "Invalid row or missing required fields"
+            })
             continue
 
         results.append(save_row(normalized))
