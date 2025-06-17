@@ -148,8 +148,15 @@ def index():
                 rows[i][key] = request.form.get(form_key, '')
 
             if action == "parse" and symbol:
+                if not rows[i].get("Sector"):
+                    cached_sector = get_sector_from_cache(symbol)
+                    if cached_sector:
+                        rows[i]["Sector"] = cached_sector
+
                 parsed = parse_data(symbol)
                 for key, value in parsed.items():
+                    if key == "Sector" and rows[i].get("Sector"):
+                        continue
                     rows[i][key] = value
 
                 sector = rows[i].get("Sector")
