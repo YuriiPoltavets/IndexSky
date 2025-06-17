@@ -43,22 +43,28 @@ def save_row(row: Dict[str, Any]) -> Dict[str, Any]:
             cur = conn.cursor()
             cur.execute(TABLE_SCHEMA)
 
-            sql = (
+            # Check if a row already exists with the same symbol and date
+            cur.execute(
+                "SELECT 1 FROM stock_metrics WHERE symbol=? AND date=? LIMIT 1",
+                (symbol, date),
+            )
+            exists = cur.fetchone() is not None
+
+            if exists:
+                # Remove the existing row to mimic UPSERT behaviour
+                cur.execute(
+                    "DELETE FROM stock_metrics WHERE symbol=? AND date=?",
+                    (symbol, date),
+                )
+
+            insert_sql = (
                 "INSERT INTO stock_metrics (symbol, date, open_price, close_price, "
                 "price_change_today, price_at_parse, skyindex_score, metrics, is_etf) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
-                "ON CONFLICT(symbol, date) DO UPDATE SET "
-                "open_price=excluded.open_price, "
-                "close_price=excluded.close_price, "
-                "price_change_today=excluded.price_change_today, "
-                "price_at_parse=excluded.price_at_parse, "
-                "skyindex_score=excluded.skyindex_score, "
-                "metrics=excluded.metrics, "
-                "is_etf=excluded.is_etf"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             )
 
             cur.execute(
-                sql,
+                insert_sql,
                 (
                     symbol,
                     date,
