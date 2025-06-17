@@ -23,7 +23,12 @@ CREATE TABLE IF NOT EXISTS stock_metrics (
 
 
 def save_row(row: Dict[str, Any]) -> Dict[str, Any]:
-    """Insert or update a normalized stock row into the database."""
+    """Insert or update a normalized stock row in ``stock_metrics``.
+
+    The ``symbol`` and ``date`` pair acts as a unique key. If a row with the
+    same values already exists, all metric columns including ``skyindex_score``
+    are updated instead of creating a duplicate.
+    """
     symbol = row.get("symbol")
     date = row.get("date")
     if not symbol or not date:
