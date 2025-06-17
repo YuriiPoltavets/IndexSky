@@ -56,6 +56,13 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not symbol:
         return None
 
+    sector = _get_value(row, 'sector', 'Sector')
+    if isinstance(sector, str):
+        sector = sector.strip()
+    if not sector:
+        # Sector is required for normalization
+        return None
+
     date_str = _get_value(row, 'date', 'Дата')
     if isinstance(date_str, str):
         date_str = date_str.strip()
