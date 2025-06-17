@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
-from data_fetcher.zacks import get_zacks_rank
+from data_fetcher import get_zacks_rank, fetch_tipranks_data
 from sector_manager import get_sector_from_cache, add_sector
 from data_fetcher.yfinance_data import get_sector_yf
 from logic.normalization import normalize_row
@@ -20,6 +20,7 @@ app = Flask(__name__)
 HEADERS = [
     "Sector",
     "Zacks",
+    "TipRanks",
     "Sector Growth",
     "EPS Growth",
     "Revenue Growth",
@@ -163,6 +164,10 @@ def index():
                     if key == "Sector" and rows[i].get("Sector"):
                         continue
                     rows[i][key] = value
+
+                tip_data = fetch_tipranks_data(symbol)
+                if tip_data and tip_data.get("tipranks_score") is not None:
+                    rows[i]["TipRanks"] = tip_data["tipranks_score"]
 
                 sector = rows[i].get("Sector")
                 if sector:
