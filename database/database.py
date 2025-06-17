@@ -1,20 +1,13 @@
 import sqlite3
 import os
 
+from .schema import stock_metrics_schema
+
 # Path to SQLite database file in project root
 DB_PATH = os.path.join(os.path.dirname(__file__), "skyindex.db")
 
 # SQL statement to ensure the table exists
-TABLE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS stock_metrics (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    symbol TEXT,
-    zacks_rank_norm REAL,
-    skyindex_score REAL,
-    date TEXT,
-    is_etf INTEGER DEFAULT NULL
-);
-"""
+TABLE_SCHEMA = stock_metrics_schema
 
 def save_stock_data(data: dict):
     """Save normalized stock metric data to the database.
