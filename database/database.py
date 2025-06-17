@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS stock_metrics (
     symbol TEXT,
     zacks_rank_norm REAL,
     skyindex_score REAL,
-    date TEXT
+    date TEXT,
+    is_etf INTEGER DEFAULT NULL
 );
 """
 
@@ -47,4 +48,20 @@ def save_stock_data(data: dict):
         conn.commit()
     finally:
         # 6) Always close the connection
+        conn.close()
+
+
+def add_is_etf_column():
+    """Add the ``is_etf`` column to the ``stock_metrics`` table if missing."""
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cur = conn.cursor()
+        cur.execute("PRAGMA table_info(stock_metrics);")
+        columns = [col[1] for col in cur.fetchall()]
+        if "is_etf" not in columns:
+            cur.execute(
+                "ALTER TABLE stock_metrics ADD COLUMN is_etf INTEGER DEFAULT NULL;"
+            )
+            conn.commit()
+    finally:
         conn.close()
