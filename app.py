@@ -206,6 +206,10 @@ def index():
                     rows[i]["row_class"] = "row-error"
                     continue
 
+                # Persist custom sector mapping after any edits
+                if symbol and sector:
+                    add_sector(symbol, sector)
+
                 save_res = save_row(normalized)
                 rows[i]["skyindex_score"] = normalized.get("skyindex_score")
                 rows[i]["Дата"] = normalized.get("date")
