@@ -147,7 +147,12 @@ def index():
                 form_key = f"{field_name(key)}_{i}"
                 rows[i][key] = request.form.get(form_key, '')
 
-            if action == "parse" and symbol:
+            sector = rows[i].get("Sector", "").strip()
+
+            if action in ("data_search", "calculate") and symbol and sector:
+                add_sector(symbol, sector)
+
+            if action == "data_search" and symbol:
                 if not rows[i].get("Sector"):
                     cached_sector = get_sector_from_cache(symbol)
                     if cached_sector:
@@ -164,10 +169,7 @@ def index():
                     rows[i]["Sector Growth"] = get_sector_growth(sector)
 
                 rows[i]["Дата"] = datetime.today().strftime('%Y-%m-%d')
-            elif action == "save":
-                if symbol and rows[i].get('Sector'):
-                    add_sector(symbol, rows[i]['Sector'])
-                    rows[i]["Дата"] = datetime.today().strftime('%Y-%m-%d')
+
             elif action == "calculate":
                 if not symbol:
                     continue
