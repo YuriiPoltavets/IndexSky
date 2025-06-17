@@ -97,13 +97,13 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return None
 
     sector_growth_1d_norm = _tanh_percent(
-        _get_value(row, 'sector_growth_1d', 'Sector Growth 1d'), 0.03
+        _get_value(row, 'sector_growth_1d'), 0.03
     )
     sector_growth_3d_norm = _tanh_percent(
-        _get_value(row, 'sector_growth_3d', 'Sector Growth 3d'), 0.06
+        _get_value(row, 'sector_growth_3d'), 0.06
     )
     sector_growth_7d_norm = _tanh_percent(
-        _get_value(row, 'sector_growth_7d', 'Sector Growth 7d'), 0.10
+        _get_value(row, 'sector_growth_7d'), 0.10
     )
 
     eps_growth_norm = percent_norm('eps_growth', 'EPS Growth')
