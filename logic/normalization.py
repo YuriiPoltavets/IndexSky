@@ -143,4 +143,5 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         'price_change_today': None,
         'price_at_parse': None,
         'skyindex_score': skyindex_score,
+        'is_etf': None,
     }
