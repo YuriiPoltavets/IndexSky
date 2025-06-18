@@ -39,3 +39,8 @@ def get_zacks_rank(symbol):
 
     # Крок 3: нічого не знайдено
     return "error"
+
+
+def fetch_zacks_rank(symbol: str):
+    """Public wrapper used by API endpoints."""
+    return get_zacks_rank(symbol)

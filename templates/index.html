@@ -81,6 +81,7 @@
         }
         .row-ok { background-color: #d4edda; }
         .row-error { background-color: #f8d7da; }
+        .row-success { background-color: #cce5ff; }
         select[data-status="error"], input[data-status="error"] {
             background-color: #f8d7da;
         }
@@ -125,7 +126,7 @@
                 <tbody>
                     {% for row in rows %}
                     {% set i = loop.index0 %}
-                    <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="">
+                    <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="" data-processed="false">
                         <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
                         <td>
                             <select name="sector_{{ i }}" class="sector-select">
@@ -155,7 +156,7 @@
         </div>
 
         <br>
-        <button name="action" value="data_search">Data Search</button>
+        <button id="data-search-btn" type="button">Data Search</button>
         <button name="action" value="calculate">Calculate</button>
         {% if sector_growth_loaded %}
           <div class="status success">✅ Sector Growth loaded</div>
