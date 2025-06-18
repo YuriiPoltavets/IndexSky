@@ -1,87 +1,65 @@
 import json
+import time
 from typing import Dict, Optional
-
 import requests
-from bs4 import BeautifulSoup
-
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
 )
 
-
-def _find_in_dict(obj, key):
-    """Yield all values of ``key`` recursively found in ``obj``."""
-
-    if isinstance(obj, dict):
-        if key in obj:
-            yield obj[key]
-        for v in obj.values():
-            yield from _find_in_dict(v, key)
-    elif isinstance(obj, list):
-        for item in obj:
-            yield from _find_in_dict(item, key)
-
-
-def fetch_tipranks_data(symbol: str) -> Optional[Dict]:
-    """Return TipRanks Smart Score for ``symbol``.
-
-    The function scrapes the TipRanks analysis page and extracts the JSON
-    data embedded in a ``<script>`` tag. ``None`` is returned if the data
-    cannot be retrieved or parsed.
-    """
-
+def fetch_tipranks_data(symbol: str, delay_sec: float = 0.8) -> Optional[Dict]:
+    """Return TipRanks Smart Score from payload.json endpoint, scanning stocks[] from end."""
     if not symbol:
         return None
 
     symbol = symbol.strip().lower()
-    url = f"https://www.tipranks.com/stocks/{symbol}/stock-analysis"
+    print(f"\n🔎 TipRanks for symbol: {symbol.upper()}")
+
+    url = f"https://www.tipranks.com/stocks/{symbol}/stock-analysis/payload.json"
     headers = {
         "User-Agent": USER_AGENT,
-        "Referer": "https://www.tipranks.com/",
+        "Accept": "application/json",
+        "Referer": f"https://www.tipranks.com/stocks/{symbol}/stock-analysis",
     }
 
     try:
+        time.sleep(delay_sec)  # avoid rate-limiting
+
         resp = requests.get(url, headers=headers, timeout=10)
-        print("\u2705 TipRanks response:", resp.status_code)
-        if resp.status_code != 200:
+        print("✅ TipRanks response:", resp.status_code)
+        if resp.status_code != 200 or not resp.text.strip():
+            print("❌ Empty or bad response body")
             return None
 
-        soup = BeautifulSoup(resp.text, "html.parser")
-        print("\ud83d\udd0d Found", len(soup.find_all("script")), "scripts")
-        script = None
-        for tag in soup.find_all("script"):
-            content = tag.string or tag.text
-            if content and "smartScore" in content:
-                print("\ud83d\udcdd script snippet:", content[:200])
-            if content and "\"_meta\"" in content and "\"stocks\"" in content:
-                script = content
+        data = resp.json()
+        print("📦 Parsed JSON keys:", list(data.keys()))
+
+        stocks = data.get("models", {}).get("stocks", [])
+        if not stocks:
+            print(f"❌ No stocks[] in JSON for {symbol.upper()}")
+            return None
+
+        score = None
+        for i in range(len(stocks) - 1, -1, -1):  # ← scan from end
+            print(f"🔍 Checking stock[{i}]...")
+            smart = stocks[i].get("smartScore")
+            if smart and isinstance(smart, dict) and "value" in smart:
+                score = smart["value"]
+                print(f"📈 Found smartScore in stock[{i}]:", score)
                 break
 
-        if not script:
-            print(f"\u26a0\ufe0f TipRanks: smartScore script not found for {symbol}")
+        if score is None:
+            print(f"❌ smartScore not found in any stock[] for {symbol.upper()}")
             return None
 
-        data = json.loads(script)
-        print(
-            "\ud83d\udce6 Parsed JSON type:",
-            type(data),
-            "keys:",
-            list(data.keys()) if isinstance(data, dict) else None,
-        )
+        return {
+            "tipranks_score": float(score),
+            "raw_data": data,
+        }
 
-        smart_score = None
-        for val in _find_in_dict(data, "smartScore"):
-            try:
-                smart_score = float(val)
-                break
-            except (TypeError, ValueError):
-                continue
-
-        if smart_score is None:
-            return None
-
-        return {"tipranks_score": smart_score, "raw_data": data}
-
-    except Exception:
+    except json.JSONDecodeError:
+        print(f"💥 Failed to decode JSON from TipRanks for {symbol.upper()}")
+        return None
+    except Exception as e:
+        print(f"💥 Exception during TipRanks fetch for {symbol.upper()}: {str(e)}")
         return None
