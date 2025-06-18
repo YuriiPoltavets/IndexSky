@@ -36,3 +36,38 @@ def get_sector_yf(symbol: str):
     except Exception:
         pass
     return None
+
+
+def fetch_yfinance_metrics(symbol: str):
+    """Return a dictionary of basic growth metrics via yfinance."""
+    try:
+        ticker = yf.Ticker(symbol)
+        info = ticker.info
+    except Exception:
+        return None
+
+    def pct(val):
+        try:
+            return f"{float(val) * 100:.2f}%"
+        except Exception:
+            return None
+
+    eps_growth = pct(info.get("earningsQuarterlyGrowth"))
+    revenue_growth = pct(info.get("revenueGrowth") or info.get("revenueQuarterlyGrowth"))
+    pe_ratio = info.get("trailingPE")
+
+    volume = info.get("volume")
+    avg_volume = info.get("averageVolume")
+    volume_change = None
+    if volume and avg_volume:
+        try:
+            volume_change = f"{((volume - avg_volume) / avg_volume) * 100:.2f}%"
+        except Exception:
+            volume_change = None
+
+    return {
+        "eps_growth": eps_growth,
+        "revenue_growth": revenue_growth,
+        "pe_ratio": pe_ratio,
+        "volume_change": volume_change,
+    }
