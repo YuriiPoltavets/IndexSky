@@ -71,6 +71,13 @@ document.querySelectorAll('.sector-select').forEach(sel => {
 
 async function onDataSearch(event) {
     event.preventDefault();
+    const REQUIRED_FIELDS = [
+        { key: 'sector' },
+        { key: 'zacks', type: 'number' },
+        { key: 'tipranks', type: 'number' },
+        { key: 'sector_growth' }
+    ];
+
     const rows = Array.from(document.querySelectorAll('tbody tr'));
 
     for (const row of rows) {
@@ -118,8 +125,29 @@ async function onDataSearch(event) {
                 const volEl = row.querySelector('.volume-change');
                 if (volEl) volEl.value = data.volume ?? '';
 
-                row.classList.add('status-success');
-                row.classList.remove('status-error');
+                let allValid = true;
+                for (const f of REQUIRED_FIELDS) {
+                    const val = data[f.key];
+                    if (val === undefined || val === null || val === '') {
+                        allValid = false;
+                        break;
+                    }
+                    if (f.type === 'number') {
+                        const num = typeof val === 'number' ? val : parseFloat(val);
+                        if (Number.isNaN(num)) {
+                            allValid = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (allValid) {
+                    row.classList.add('status-success');
+                    row.classList.remove('status-error');
+                } else {
+                    row.classList.add('status-error');
+                    row.classList.remove('status-success');
+                }
             })
             .catch(err => {
                 console.error('Fetch row failed', err);
