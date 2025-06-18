@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import Optional, Dict
 
-from data_fetcher import get_zacks_rank, fetch_tipranks_data
-from data_fetcher.yfinance_data import get_sector_yf
+from fetchers.manager import FetcherManager
+from fetchers.yfinance_data import get_sector_yf
 from sector_manager import get_sector_from_cache
 from sector_growth_cache import get_sector_growth
+
+fetcher_manager = FetcherManager()
 
 
 def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int] = None) -> Dict:
@@ -15,18 +17,16 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     symbol = str(symbol).strip().upper()
     if not sector:
         sector = get_sector_from_cache(symbol) or get_sector_yf(symbol) or ""
-    try:
-        zacks_raw = get_zacks_rank(symbol)
-        zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None
-    except Exception:
-        zacks = None
 
-    try:
-        tip = fetch_tipranks_data(symbol)
-        tip_val = tip.get("tipranks_score") if tip else None
-        tipranks = int(tip_val) if isinstance(tip_val, (int, float)) else None
-    except Exception:
-        tipranks = None
+    fetched = fetcher_manager.fetch_all(symbol)
+    zacks_raw = fetched.get("zacks")
+    zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None
+    tip_val = fetched.get("tipranks")
+    tipranks = int(tip_val) if isinstance(tip_val, (int, float)) else None
+    eps = fetched.get("eps")
+    revenue = fetched.get("revenue")
+    pe_ratio = fetched.get("pe_ratio")
+    volume = fetched.get("volume")
 
     sector_growth = ""
     if sector:
@@ -40,10 +40,10 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
         "tipranks": tipranks,
         "sector": sector,
         "sector_growth": sector_growth,
-        "eps": "",
-        "revenue": "",
-        "pe_ratio": "",
-        "volume": "",
+        "eps": eps,
+        "revenue": revenue,
+        "pe_ratio": pe_ratio,
+        "volume": volume,
         "date": datetime.today().strftime("%Y-%m-%d"),
     }
     if row_index is not None:
@@ -55,7 +55,8 @@ def parse_data(symbol: str) -> Dict:
     """Return basic info about the given symbol for form prefilling."""
     if not symbol:
         return {}
-    rank = get_zacks_rank(symbol)
+    fetched = fetcher_manager.fetch_all(symbol)
+    rank = fetched.get("zacks")
     sector = get_sector_from_cache(symbol)
     if sector is None:
         try:
