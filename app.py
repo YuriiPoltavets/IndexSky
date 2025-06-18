@@ -138,52 +138,6 @@ def fetch_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-@app.route("/save", methods=["POST"])
-def save_data():
-    """Normalize and save rows of stock data from JSON."""
-    try:
-        payload = request.get_json(force=True)
-    except Exception:
-        return jsonify({"error": "Invalid JSON"}), 400
-
-    if not isinstance(payload, list):
-        return jsonify({"error": "Expected list of rows"}), 400
-
-    results = []
-    for row in payload:
-        if not isinstance(row, dict):
-            results.append({"symbol": None, "status": "error", "reason": "invalid row format"})
-            continue
-
-        symbol = row.get("symbol") or row.get("Symbol")
-        if isinstance(symbol, str):
-            symbol = symbol.strip().upper() or None
-
-        # Skip completely blank rows (no symbol and no data)
-        if not symbol and all(not str(row.get(key, '')).strip() for key in HEADERS):
-            continue
-
-        sector = row.get("Sector") or row.get("sector")
-        if isinstance(sector, str):
-            sector = sector.strip()
-        if symbol and sector:
-            add_sector(symbol, sector)
-
-        normalized = normalize_row(row)
-        if normalized is None:
-            results.append({
-                "symbol": symbol,
-                "status": "error",
-                "reason": "Invalid row or missing required fields"
-            })
-            continue
-
-        results.append(save_row(normalized))
-
-    return jsonify(results)
-
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     default_count = 5
