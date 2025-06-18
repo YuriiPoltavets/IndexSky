@@ -18,13 +18,15 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     if not symbol or not str(symbol).strip():
         raise ValueError("Symbol is required")
 
-    symbol = str(symbol).strip().upper()
+    symbol = str(symbol).strip().upper() 
     if not sector:
         sector = get_sector_from_cache(symbol) or get_sector_yf(symbol) or ""
 
     fetched = fetcher_manager.fetch_all(symbol)
+
     zacks_raw = fetched.get("zacks")
     zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None
+
     tip_val = fetched.get("tipranks")
     tipranks = int(tip_val) if isinstance(tip_val, (int, float)) else None
 
@@ -48,6 +50,7 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
             sector_growth = ""
 
     result = {
+        "symbol": symbol, 
         "zacks": zacks,
         "tipranks": tipranks,
         "sector": sector,
@@ -58,8 +61,10 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
         "volume": volume,
         "date": datetime.today().strftime("%Y-%m-%d"),
     }
+
     if row_index is not None:
         result["rowIndex"] = row_index
+
     return result
 
 
@@ -67,17 +72,22 @@ def parse_data(symbol: str) -> Dict:
     """Return basic info about the given symbol for form prefilling."""
     if not symbol:
         return {}
+
     zacks_data = zacks_fetcher.fetch(symbol)
     tipranks_data = tipranks_fetcher.fetch(symbol)
+
     rank = zacks_data.get("zacks") if zacks_data else ""
+
     sector = get_sector_from_cache(symbol)
     if sector is None:
         try:
             sector = get_sector_yf(symbol)
         except Exception:
             sector = ""
+
     if not isinstance(sector, str):
         sector = ""
+
     return {
         "Sector": sector or "",
         "Zacks": rank,
