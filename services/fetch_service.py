@@ -2,11 +2,13 @@ from datetime import datetime
 from typing import Optional, Dict
 
 from fetchers.manager import FetcherManager
+from fetchers.zacks import ZacksFetcher
 from fetchers.yfinance_data import get_sector_yf
 from sector_manager import get_sector_from_cache
 from sector_growth_cache import get_sector_growth
 
 fetcher_manager = FetcherManager()
+zacks_fetcher = ZacksFetcher()
 
 
 def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int] = None) -> Dict:
@@ -55,7 +57,7 @@ def parse_data(symbol: str) -> Dict:
     """Return basic info about the given symbol for form prefilling."""
     if not symbol:
         return {}
-    fetched = fetcher_manager.fetch_all(symbol)
+    fetched = zacks_fetcher.fetch(symbol)
     rank = fetched.get("zacks")
     sector = get_sector_from_cache(symbol)
     if sector is None:
