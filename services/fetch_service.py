@@ -68,6 +68,7 @@ def parse_data(symbol: str) -> Dict:
     return {
         "Sector": sector if sector else "",
         "Zacks": rank,
+        "TipRanks": "",
         "Sector Growth": "",
         "EPS Growth": "",
         "Revenue Growth": "",
