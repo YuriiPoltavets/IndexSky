@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from data_fetcher import get_zacks_rank, fetch_tipranks_data
-from data_fetcher.zacks import fetch_zacks_rank
 from sector_manager import get_sector_from_cache, add_sector
-from data_fetcher.yfinance_data import get_sector_yf, fetch_yfinance_metrics
+from data_fetcher.yfinance_data import get_sector_yf
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
 from sector_growth_cache import (
@@ -123,35 +122,6 @@ def save_data():
         results.append(save_row(normalized))
 
     return jsonify(results)
-
-
-@app.route('/fetch-row', methods=['POST'])
-def fetch_row():
-    payload = request.get_json(force=True)
-    if not isinstance(payload, dict):
-        return jsonify({'error': 'Invalid payload'}), 400
-
-    symbol = (payload.get('symbol') or '').strip()
-    idx = payload.get('idx')
-    if not symbol:
-        return jsonify({'error': 'No symbol provided'}), 400
-
-    zacks = fetch_zacks_rank(symbol)
-    tipranks = fetch_tipranks_data(symbol)
-    yfin = fetch_yfinance_metrics(symbol)
-
-    result = {
-        'idx': idx,
-        'symbol': symbol.upper(),
-        'zacks': zacks,
-        'tipranks': tipranks.get('tipranks_score') if tipranks else None,
-        'eps': yfin.get('eps_growth') if yfin else None,
-        'revenue': yfin.get('revenue_growth') if yfin else None,
-        'pe_ratio': yfin.get('pe_ratio') if yfin else None,
-        'volume': yfin.get('volume_change') if yfin else None,
-    }
-
-    return jsonify(result)
 
 
 @app.route('/', methods=['GET', 'POST'])
