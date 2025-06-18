@@ -1,0 +1,95 @@
+<!-- MOCK TEST PAGE for UI testing without backend -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mock UI Test</title>
+<style>
+  table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 4px; }
+  .status-success { background-color: #d0f0ff; }
+  .status-error { background-color: #ffd6d6; }
+</style>
+</head>
+<body>
+<table>
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Sector</th>
+      <th>Zacks</th>
+      <th>TipRanks</th>
+      <th>Sector Growth</th>
+      <th>EPS Growth</th>
+      <th>Revenue Growth</th>
+      <th>PE Ratio</th>
+      <th>Volume Change</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-row-id="0">
+      <td><input type="text" class="symbol-input" value="AAPL"></td>
+      <td>
+        <select class="sector-select">
+          <option value="">-</option>
+          <option value="Technology">Technology</option>
+          <option value="Finance">Finance</option>
+        </select>
+      </td>
+      <td><input type="text" class="zacks-output"></td>
+      <td><input type="text" name="tipranks_0"></td>
+      <td><input type="text" class="sector-growth"></td>
+      <td><input type="text" class="eps-growth"></td>
+      <td><input type="text" class="revenue-growth"></td>
+      <td><input type="text" class="pe-ratio"></td>
+      <td><input type="text" class="volume-change"></td>
+      <td class="date-cell"></td>
+    </tr>
+    <tr data-row-id="1">
+      <td><input type="text" class="symbol-input" value="MSFT"></td>
+      <td>
+        <select class="sector-select">
+          <option value="">-</option>
+          <option value="Technology">Technology</option>
+          <option value="Finance">Finance</option>
+        </select>
+      </td>
+      <td><input type="text" class="zacks-output"></td>
+      <td><input type="text" name="tipranks_1"></td>
+      <td><input type="text" class="sector-growth"></td>
+      <td><input type="text" class="eps-growth"></td>
+      <td><input type="text" class="revenue-growth"></td>
+      <td><input type="text" class="pe-ratio"></td>
+      <td><input type="text" class="volume-change"></td>
+      <td class="date-cell"></td>
+    </tr>
+  </tbody>
+</table>
+
+<button value="data_search">Data Search</button>
+
+<script>
+window.fetch = async () => ({
+  ok: true,
+  status: 200,
+  json: async () => ({
+    sector: "Technology",
+    zacks: 1,
+    tipranks: 7.5,
+    sector_growth: "2.3%",
+    date: "2025-06-18",
+    eps: "12%",
+    revenue: "8%",
+    pe_ratio: "15.2",
+    volume: "-4%"
+  })
+});
+</script>
+
+<script type="module" src="../static/js/constants.js"></script>
+<script type="module" src="../static/js/fetchRow.js"></script>
+<script type="module" src="../static/js/domUtils.js"></script>
+<script type="module" src="../static/js/validators.js"></script>
+<script type="module" src="../static/js/main.js"></script>
+</body>
+</html>
