@@ -86,27 +86,39 @@ async function onDataSearch(event) {
         })
             .then(resp => resp.json())
             .then(data => {
-                row.querySelector('.zacks-output').value = data['zacks'] ?? '';
-                row.querySelector(`input[name="tipranks_${idx}"]`).value = data['tipranks'] ?? '';
-                row.querySelector('.sector-growth').value = data['sector_growth'] ?? '';
-                row.querySelector('.eps-growth').value = data['eps'] ?? '';
-                row.querySelector('.revenue-growth').value = data['revenue'] ?? '';
-                row.querySelector('.pe-ratio').value = data['pe_ratio'] ?? '';
-                row.querySelector('.volume-change').value = data['volume'] ?? '';
-                row.querySelector('.date-cell').textContent = data['date'] ?? '';
+                const { zacks, tipranks, sector_growth, date } = data;
 
-                try {
-                    row.classList.remove('status-error');
-                    row.classList.add('status-success');
-                } catch (e) {
-                    row.classList.remove('status-success');
-                    row.classList.add('status-error');
-                }
+                const zacksEl = row.querySelector('.zacks-output');
+                if (zacksEl) zacksEl.value = zacks ?? '';
+
+                const tipEl = row.querySelector(`input[name="tipranks_${idx}"]`);
+                if (tipEl) tipEl.value = tipranks ?? '';
+
+                const sectorGrowthEl = row.querySelector('.sector-growth');
+                if (sectorGrowthEl) sectorGrowthEl.value = sector_growth ?? '';
+
+                const dateEl = row.querySelector('.date-cell');
+                if (dateEl) dateEl.textContent = date ?? '';
+
+                const epsEl = row.querySelector('.eps-growth');
+                if (epsEl) epsEl.value = data.eps ?? '';
+
+                const revEl = row.querySelector('.revenue-growth');
+                if (revEl) revEl.value = data.revenue ?? '';
+
+                const peEl = row.querySelector('.pe-ratio');
+                if (peEl) peEl.value = data.pe_ratio ?? '';
+
+                const volEl = row.querySelector('.volume-change');
+                if (volEl) volEl.value = data.volume ?? '';
+
+                row.classList.add('status-success');
+                row.classList.remove('status-error');
             })
             .catch(err => {
-                console.log('Fetch row failed', err);
-                row.classList.remove('status-success');
+                console.error('Fetch row failed', err);
                 row.classList.add('status-error');
+                row.classList.remove('status-success');
             });
 
         await new Promise(r => setTimeout(r, 300));
