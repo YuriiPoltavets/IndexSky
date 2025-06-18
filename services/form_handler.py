@@ -7,40 +7,17 @@ from sector_growth_cache import (
     get_sector_growth,
     get_sector_growth_data,
 )
+from config.constants import HEADERS, SECTOR_OPTIONS
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
 from data_fetcher import fetch_tipranks_data
 from .fetch_service import parse_data
 
+# HEADERS and SECTOR_OPTIONS are provided via config.constants
+
 # Prefetch sector growth metrics on startup
 sector_growth_loaded = load_sector_growth()
 
-# Table headers shown in the UI
-HEADERS = [
-    "Sector",
-    "Zacks",
-    "TipRanks",
-    "Sector Growth",
-    "EPS Growth",
-    "Revenue Growth",
-    "PE Ratio",
-    "Volume Change",
-]
-
-# Dropdown options for sectors
-SECTOR_OPTIONS = [
-    "Technology",
-    "Financials",
-    "Healthcare",
-    "Communication Services",
-    "Consumer Discretionary",
-    "Consumer Staples",
-    "Industrials",
-    "Materials",
-    "Energy",
-    "Utilities",
-    "Real Estate",
-]
 
 
 def field_name(key: str) -> str:

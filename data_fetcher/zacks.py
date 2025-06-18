@@ -3,8 +3,10 @@ from bs4 import BeautifulSoup
 import time
 import random
 
+from config.delays import ZACKS_DELAY
+
 def get_zacks_rank(symbol):
-    time.sleep(random.uniform(0.1, 1.0))  # антиспам-затримка
+    time.sleep(random.uniform(ZACKS_DELAY - 0.9, ZACKS_DELAY))  # антиспам-затримка
 
     urls = [
         f"https://www.zacks.com/stock/quote/{symbol}?q={symbol}",
