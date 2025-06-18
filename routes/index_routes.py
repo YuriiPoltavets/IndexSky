@@ -2,10 +2,9 @@ from flask import Blueprint, render_template, request
 
 from services.form_handler import (
     process_index_form,
-    HEADERS,
-    SECTOR_OPTIONS,
     sector_growth_loaded,
 )
+from config.constants import HEADERS, SECTOR_OPTIONS
 
 index_bp = Blueprint('index_bp', __name__)
 

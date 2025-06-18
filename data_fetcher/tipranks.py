@@ -4,6 +4,8 @@ import random
 import requests
 from typing import Optional, Dict  # ✅ ІМПОРТ ПЕРЕД функцією
 
+from config.delays import TIPRANKS_DELAY
+
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
@@ -25,7 +27,7 @@ def fetch_tipranks_data(symbol: str) -> Optional[Dict]:
         "Referer": f"https://www.tipranks.com/stocks/{symbol}/stock-analysis",
     }
 
-    time.sleep(random.uniform(1.8, 3.3))  # ⏱️ затримка для обходу захисту
+    time.sleep(random.uniform(TIPRANKS_DELAY + 0.3, TIPRANKS_DELAY + 1.8))  # ⏱️ затримка для обходу захисту
 
     try:
         resp = requests.get(url, headers=headers, timeout=10)

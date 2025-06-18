@@ -2,7 +2,9 @@ import json
 import os
 from typing import Optional, Dict
 
-FILE_PATH = os.path.join(os.path.dirname(__file__), "custom_sectors.json")
+from config.paths import CUSTOM_SECTOR_PATH
+
+FILE_PATH = os.path.join(os.path.dirname(__file__), CUSTOM_SECTOR_PATH)
 
 
 def load_custom_sectors() -> Dict[str, str]:

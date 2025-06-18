@@ -3,6 +3,7 @@ import math
 from typing import Any, Dict, Optional
 
 from .rating import calculate_skyindex_score
+from config.normalization import SCALE_1D, SCALE_3D, SCALE_7D
 
 
 def _get_value(data: Dict[str, Any], *keys: str) -> Optional[str]:
@@ -104,13 +105,13 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return None
 
     sector_growth_1d_norm = _tanh_percent(
-        _get_value(row, 'sector_growth_1d'), 0.03
+        _get_value(row, 'sector_growth_1d'), SCALE_1D
     )
     sector_growth_3d_norm = _tanh_percent(
-        _get_value(row, 'sector_growth_3d'), 0.06
+        _get_value(row, 'sector_growth_3d'), SCALE_3D
     )
     sector_growth_7d_norm = _tanh_percent(
-        _get_value(row, 'sector_growth_7d'), 0.10
+        _get_value(row, 'sector_growth_7d'), SCALE_7D
     )
 
     eps_growth_norm = percent_norm('eps_growth', 'EPS Growth')
