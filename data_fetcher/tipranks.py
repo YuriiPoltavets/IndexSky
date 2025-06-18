@@ -1,14 +1,17 @@
 import json
 import time
-from typing import Dict, Optional
+import random
 import requests
+from typing import Optional, Dict  # ✅ ІМПОРТ ПЕРЕД функцією
 
 USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
 )
 
-def fetch_tipranks_data(symbol: str, delay_sec: float = 0.8) -> Optional[Dict]:
-    """Return TipRanks Smart Score from payload.json endpoint, scanning stocks[] from end."""
+def fetch_tipranks_data(symbol: str) -> Optional[Dict]:
+    """Fetch TipRanks SmartScore for a given stock symbol."""
+
     if not symbol:
         return None
 
@@ -22,44 +25,47 @@ def fetch_tipranks_data(symbol: str, delay_sec: float = 0.8) -> Optional[Dict]:
         "Referer": f"https://www.tipranks.com/stocks/{symbol}/stock-analysis",
     }
 
-    try:
-        time.sleep(delay_sec)  # avoid rate-limiting
+    time.sleep(random.uniform(1.8, 3.3))  # ⏱️ затримка для обходу захисту
 
+    try:
         resp = requests.get(url, headers=headers, timeout=10)
         print("✅ TipRanks response:", resp.status_code)
+
         if resp.status_code != 200 or not resp.text.strip():
-            print("❌ Empty or bad response body")
+            print("❌ Invalid response from TipRanks")
             return None
 
-        data = resp.json()
+        if "<html" in resp.text.lower():
+            print("❌ HTML detected — response is not JSON")
+            return None
+
+        try:
+            data = resp.json()
+        except json.JSONDecodeError:
+            print("💥 Failed to decode JSON")
+            return None
+
         print("📦 Parsed JSON keys:", list(data.keys()))
 
         stocks = data.get("models", {}).get("stocks", [])
         if not stocks:
-            print(f"❌ No stocks[] in JSON for {symbol.upper()}")
+            print("❌ No 'stocks' section in JSON")
             return None
 
-        score = None
-        for i in range(len(stocks) - 1, -1, -1):  # ← scan from end
-            print(f"🔍 Checking stock[{i}]...")
-            smart = stocks[i].get("smartScore")
-            if smart and isinstance(smart, dict) and "value" in smart:
+        for i in reversed(range(len(stocks))):
+            stock = stocks[i]
+            smart = stock.get("smartScore")
+            if isinstance(smart, dict) and "value" in smart:
                 score = smart["value"]
                 print(f"📈 Found smartScore in stock[{i}]:", score)
-                break
+                return {
+                    "tipranks_score": float(score),
+                    "raw_data": data,
+                }
 
-        if score is None:
-            print(f"❌ smartScore not found in any stock[] for {symbol.upper()}")
-            return None
-
-        return {
-            "tipranks_score": float(score),
-            "raw_data": data,
-        }
-
-    except json.JSONDecodeError:
-        print(f"💥 Failed to decode JSON from TipRanks for {symbol.upper()}")
+        print("❌ smartScore not found in any stock[] entry")
         return None
+
     except Exception as e:
-        print(f"💥 Exception during TipRanks fetch for {symbol.upper()}: {str(e)}")
+        print(f"💥 Exception during TipRanks fetch: {e}")
         return None
