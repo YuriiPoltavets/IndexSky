@@ -68,3 +68,49 @@ document.querySelectorAll('.sector-select').forEach(sel => {
         }
     });
 });
+
+async function onDataSearch(event) {
+    event.preventDefault();
+    const rows = Array.from(document.querySelectorAll('tbody tr'));
+
+    for (const row of rows) {
+        const idx = row.dataset.rowId;
+        const symbol = row.querySelector('.symbol-input')?.value.trim();
+        if (!symbol) continue;
+        const sector = row.querySelector('.sector-select')?.value.trim();
+
+        await fetch('/fetch-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symbol, sector, idx })
+        })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.zacks !== undefined) row.querySelector('.zacks-output').value = data.zacks || '';
+                if (data.tipranks !== undefined) row.querySelector(`input[name="tipranks_${idx}"]`).value = data.tipranks || '';
+                if (data.sector_growth !== undefined) row.querySelector('.sector-growth').value = data.sector_growth || '';
+                if (data.eps !== undefined) row.querySelector('.eps-growth').value = data.eps || '';
+                if (data.revenue !== undefined) row.querySelector('.revenue-growth').value = data.revenue || '';
+                if (data.pe_ratio !== undefined) row.querySelector('.pe-ratio').value = data.pe_ratio || '';
+                if (data.volume !== undefined) row.querySelector('.volume-change').value = data.volume || '';
+                if (data.date !== undefined) row.querySelector('.date-cell').textContent = data.date;
+
+                try {
+                    row.classList.remove('status-error');
+                    row.classList.add('status-success');
+                } catch (e) {
+                    row.classList.remove('status-success');
+                    row.classList.add('status-error');
+                }
+            })
+            .catch(err => {
+                console.log('Fetch row failed', err);
+                row.classList.remove('status-success');
+                row.classList.add('status-error');
+            });
+
+        await new Promise(r => setTimeout(r, 300));
+    }
+}
+
+document.querySelector('button[value="data_search"]')?.addEventListener('click', onDataSearch);
