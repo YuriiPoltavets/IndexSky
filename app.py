@@ -88,6 +88,7 @@ def fetch_data():
         return jsonify({"error": "Invalid JSON"}), 400
 
     symbol = payload.get("symbol") if isinstance(payload, dict) else None
+    row_index = payload.get("rowIndex") if isinstance(payload, dict) else None
     if not symbol or not str(symbol).strip():
         return jsonify({"error": "Symbol is required"}), 400
 
@@ -131,6 +132,8 @@ def fetch_data():
             "volume": "",
             "date": datetime.today().strftime("%Y-%m-%d"),
         }
+        if row_index is not None:
+            result["rowIndex"] = row_index
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
