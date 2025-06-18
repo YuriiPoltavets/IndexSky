@@ -1,12 +1,6 @@
 HEADERS = [
-    "Sector",
-    "Zacks",
-    "TipRanks",
-    "Sector Growth",
-    "EPS Growth",
-    "Revenue Growth",
-    "PE Ratio",
-    "Volume Change",
+    "Sector", "Zacks", "TipRanks", "Sector Growth",
+    "EPS Growth", "Revenue Growth", "PE Ratio", "Volume Change"
 ]
 
 SECTOR_OPTIONS = [
