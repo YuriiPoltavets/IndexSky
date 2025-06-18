@@ -86,14 +86,14 @@ async function onDataSearch(event) {
         })
             .then(resp => resp.json())
             .then(data => {
-                if (data.zacks !== undefined) row.querySelector('.zacks-output').value = data.zacks || '';
-                if (data.tipranks !== undefined) row.querySelector(`input[name="tipranks_${idx}"]`).value = data.tipranks || '';
-                if (data.sector_growth !== undefined) row.querySelector('.sector-growth').value = data.sector_growth || '';
-                if (data.eps !== undefined) row.querySelector('.eps-growth').value = data.eps || '';
-                if (data.revenue !== undefined) row.querySelector('.revenue-growth').value = data.revenue || '';
-                if (data.pe_ratio !== undefined) row.querySelector('.pe-ratio').value = data.pe_ratio || '';
-                if (data.volume !== undefined) row.querySelector('.volume-change').value = data.volume || '';
-                if (data.date !== undefined) row.querySelector('.date-cell').textContent = data.date;
+                row.querySelector('.zacks-output').value = data['zacks'] ?? '';
+                row.querySelector(`input[name="tipranks_${idx}"]`).value = data['tipranks'] ?? '';
+                row.querySelector('.sector-growth').value = data['sector_growth'] ?? '';
+                row.querySelector('.eps-growth').value = data['eps'] ?? '';
+                row.querySelector('.revenue-growth').value = data['revenue'] ?? '';
+                row.querySelector('.pe-ratio').value = data['pe_ratio'] ?? '';
+                row.querySelector('.volume-change').value = data['volume'] ?? '';
+                row.querySelector('.date-cell').textContent = data['date'] ?? '';
 
                 try {
                     row.classList.remove('status-error');
