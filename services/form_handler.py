@@ -10,7 +10,9 @@ from sector_growth_cache import (
 from config.constants import HEADERS, SECTOR_OPTIONS
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
-from data_fetcher import fetch_tipranks_data
+from fetchers.tipranks import TipranksFetcher
+
+tipranks_fetcher = TipranksFetcher()
 from .fetch_service import parse_data
 
 # HEADERS and SECTOR_OPTIONS are provided via config.constants
@@ -73,9 +75,9 @@ def process_index_form(req: Request, default_count: int = 5):
                         continue
                     rows[i][key] = value
 
-                tip_data = fetch_tipranks_data(symbol)
-                if tip_data and tip_data.get("tipranks_score") is not None:
-                    rows[i]["TipRanks"] = tip_data["tipranks_score"]
+                tip_data = tipranks_fetcher.fetch(symbol)
+                if tip_data.get("tipranks") is not None:
+                    rows[i]["TipRanks"] = tip_data["tipranks"]
 
                 sector = rows[i].get("Sector")
                 if sector:
