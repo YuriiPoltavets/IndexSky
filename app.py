@@ -79,6 +79,63 @@ def parse_data(symbol):
     }
 
 
+@app.route("/fetch-data", methods=["POST"])
+def fetch_data():
+    """Return parsed data for a single stock symbol."""
+    try:
+        payload = request.get_json(force=True)
+    except Exception:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    symbol = payload.get("symbol") if isinstance(payload, dict) else None
+    if not symbol or not str(symbol).strip():
+        return jsonify({"error": "Symbol is required"}), 400
+
+    symbol = str(symbol).strip().upper()
+    sector = ""
+    if isinstance(payload.get("sector"), str):
+        sector = payload["sector"].strip()
+
+    try:
+        if not sector:
+            sector = get_sector_from_cache(symbol) or get_sector_yf(symbol) or ""
+
+        try:
+            zacks_raw = get_zacks_rank(symbol)
+            zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None
+        except Exception:
+            zacks = None
+
+        try:
+            tip = fetch_tipranks_data(symbol)
+            tip_val = tip.get("tipranks_score") if tip else None
+            tipranks = int(tip_val) if isinstance(tip_val, (int, float)) else None
+        except Exception:
+            tipranks = None
+
+        sector_growth = ""
+        if sector:
+            try:
+                sector_growth = get_sector_growth(sector)
+            except Exception:
+                sector_growth = ""
+
+        result = {
+            "zacks": zacks,
+            "tipranks": tipranks,
+            "sector": sector,
+            "sector_growth": sector_growth,
+            "eps": "",
+            "revenue": "",
+            "pe_ratio": "",
+            "volume": "",
+            "date": datetime.today().strftime("%Y-%m-%d"),
+        }
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/save", methods=["POST"])
 def save_data():
     """Normalize and save rows of stock data from JSON."""
