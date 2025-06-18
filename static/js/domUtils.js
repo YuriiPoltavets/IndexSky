@@ -1,8 +1,13 @@
 import { CLASS_SUCCESS, CLASS_ERROR } from './constants.js';
 
 export function fillRowWithData(row, data) {
-  const { sector, zacks, tipranks, sector_growth, date } = data;
+  const { symbol, sector, zacks, tipranks, sector_growth, date } = data;
   const rowIndex = row.dataset.rowId;
+
+  const symbolEl = row.querySelector('.symbol-input');
+  if (symbolEl && symbol) {
+    symbolEl.value = String(symbol).toUpperCase();
+  }
 
   const sectorEl = row.querySelector('.sector-select');
   if (sectorEl && sector && !sectorEl.value) {
