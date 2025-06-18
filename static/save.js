@@ -74,7 +74,8 @@ async function onDataSearch(event) {
     const rows = Array.from(document.querySelectorAll('tbody tr'));
 
     for (const row of rows) {
-        const idx = row.dataset.rowId;
+        if (row.classList.contains('status-success')) continue;
+        const rowIndex = row.dataset.rowId;
         const symbol = row.querySelector('.symbol-input')?.value.trim();
         if (!symbol) continue;
         const sector = row.querySelector('.sector-select')?.value.trim();
@@ -82,7 +83,7 @@ async function onDataSearch(event) {
         await fetch('/fetch-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ symbol, sector, idx })
+            body: JSON.stringify({ symbol, sector, rowIndex })
         })
             .then(resp => resp.json())
             .then(data => {
@@ -96,7 +97,7 @@ async function onDataSearch(event) {
                 const zacksEl = row.querySelector('.zacks-output');
                 if (zacksEl) zacksEl.value = zacks ?? '';
 
-                const tipEl = row.querySelector(`input[name="tipranks_${idx}"]`);
+                const tipEl = row.querySelector(`input[name="tipranks_${rowIndex}"]`);
                 if (tipEl) tipEl.value = tipranks ?? '';
 
                 const sectorGrowthEl = row.querySelector('.sector-growth');
