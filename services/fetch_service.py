@@ -3,12 +3,14 @@ from typing import Optional, Dict
 
 from fetchers.manager import FetcherManager
 from fetchers.zacks import ZacksFetcher
+from fetchers.tipranks import TipranksFetcher
 from fetchers.yfinance_data import get_sector_yf
 from sector_manager import get_sector_from_cache
 from sector_growth_cache import get_sector_growth
 
 fetcher_manager = FetcherManager()
 zacks_fetcher = ZacksFetcher()
+tipranks_fetcher = TipranksFetcher()
 
 
 def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int] = None) -> Dict:
@@ -25,10 +27,18 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None
     tip_val = fetched.get("tipranks")
     tipranks = int(tip_val) if isinstance(tip_val, (int, float)) else None
-    eps = fetched.get("eps")
-    revenue = fetched.get("revenue")
-    pe_ratio = fetched.get("pe_ratio")
-    volume = fetched.get("volume")
+
+    eps_val = fetched.get("eps")
+    eps = eps_val if isinstance(eps_val, (int, float)) else None
+
+    revenue_val = fetched.get("revenue")
+    revenue = revenue_val if isinstance(revenue_val, (int, float)) else None
+
+    pe_val = fetched.get("pe_ratio")
+    pe_ratio = pe_val if isinstance(pe_val, (int, float)) else None
+
+    vol_val = fetched.get("volume")
+    volume = vol_val if isinstance(vol_val, (int, float)) else None
 
     sector_growth = ""
     if sector:
@@ -57,8 +67,9 @@ def parse_data(symbol: str) -> Dict:
     """Return basic info about the given symbol for form prefilling."""
     if not symbol:
         return {}
-    fetched = zacks_fetcher.fetch(symbol)
-    rank = fetched.get("zacks")
+    zacks_data = zacks_fetcher.fetch(symbol)
+    tipranks_data = tipranks_fetcher.fetch(symbol)
+    rank = zacks_data.get("zacks") if zacks_data else ""
     sector = get_sector_from_cache(symbol)
     if sector is None:
         try:
@@ -68,9 +79,9 @@ def parse_data(symbol: str) -> Dict:
     if not isinstance(sector, str):
         sector = ""
     return {
-        "Sector": sector if sector else "",
+        "Sector": sector or "",
         "Zacks": rank,
-        "TipRanks": "",
+        "TipRanks": tipranks_data.get("tipranks") if tipranks_data else "",
         "Sector Growth": "",
         "EPS Growth": "",
         "Revenue Growth": "",
