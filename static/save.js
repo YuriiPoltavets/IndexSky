@@ -86,7 +86,12 @@ async function onDataSearch(event) {
         })
             .then(resp => resp.json())
             .then(data => {
-                const { zacks, tipranks, sector_growth, date } = data;
+                const { zacks, tipranks, sector_growth, date, sector } = data;
+
+                const sectorEl = row.querySelector('.sector-select');
+                if (sectorEl && sector && !sectorEl.value) {
+                    sectorEl.value = sector;
+                }
 
                 const zacksEl = row.querySelector('.zacks-output');
                 if (zacksEl) zacksEl.value = zacks ?? '';
