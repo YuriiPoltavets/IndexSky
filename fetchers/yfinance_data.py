@@ -1,3 +1,4 @@
+# yfinance_data.py
 """YFinance based fetchers and utilities."""
 
 from typing import Dict, Optional
