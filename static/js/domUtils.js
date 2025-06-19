@@ -26,17 +26,6 @@ export function fillRowWithData(row, data) {
   const dateEl = row.querySelector('.date-cell');
   if (dateEl) dateEl.textContent = date ?? '';
 
-  const epsEl = row.querySelector('.eps-growth');
-  if (epsEl) epsEl.value = data.eps ?? '';
-
-  const revEl = row.querySelector('.revenue-growth');
-  if (revEl) revEl.value = data.revenue ?? '';
-
-  const peEl = row.querySelector('.pe-ratio');
-  if (peEl) peEl.value = data.pe_ratio ?? '';
-
-  const volEl = row.querySelector('.volume-change');
-  if (volEl) volEl.value = data.volume ?? '';
 }
 
 export function setRowStatus(row, isSuccess) {

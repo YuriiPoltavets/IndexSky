@@ -32,18 +32,6 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     if tipranks is not None:
         print(f"🎯 TipRanks score parsed: {tipranks}")
 
-    eps_val = fetched.get("eps")
-    eps = eps_val if isinstance(eps_val, (int, float)) else None
-
-    revenue_val = fetched.get("revenue")
-    revenue = revenue_val if isinstance(revenue_val, (int, float)) else None
-
-    pe_val = fetched.get("pe_ratio")
-    pe_ratio = pe_val if isinstance(pe_val, (int, float)) else None
-
-    vol_val = fetched.get("volume")
-    volume = vol_val if isinstance(vol_val, (int, float)) else None
-
     sector_growth = ""
     if sector:
         try:
@@ -57,10 +45,6 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
         "tipranks": tipranks,
         "sector": sector,
         "sector_growth": sector_growth,
-        "eps": eps,
-        "revenue": revenue,
-        "pe_ratio": pe_ratio,
-        "volume": volume,
         "date": datetime.today().strftime("%Y-%m-%d"),
     }
 
@@ -98,8 +82,4 @@ def parse_data(symbol: str) -> Dict:
         "Zacks": rank,
         "TipRanks": tip_val,
         "Sector Growth": "",
-        "EPS Growth": "",
-        "Revenue Growth": "",
-        "PE Ratio": "",
-        "Volume Change": "",
     }
