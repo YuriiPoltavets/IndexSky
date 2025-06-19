@@ -43,6 +43,9 @@
         .zacks-output {
             width: 55px;
         }
+        .tipranks-col {
+            width: 90px;
+        }
         .sector-growth {
             width: 110px;
         }
@@ -111,17 +114,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th data-tooltip="Біржовий тикер акції або ETF">Symbol</th>
-                        <th data-tooltip="Галузь, до якої належить компанія">Sector</th>
-                        <th data-tooltip="Рейтинг Zacks від 1 (сильна покупка) до 5 (продаж)">Zacks</th>
-                        <th>TipRanks</th>
-                        <th data-tooltip="Зміна ціни галузевого ETF за певний період">Sector Growth</th>
-                        <th data-tooltip="Ріст прибутку на акцію за рік або квартал">EPS Growth</th>
-                        <th data-tooltip="Зростання виручки компанії">Revenue Growth</th>
-                        <th data-tooltip="Співвідношення ціни до прибутку">PE Ratio</th>
-                        <th data-tooltip="Зміна обсягу торгів за добу">Volume Change</th>
-                        <th data-tooltip="Підсумкова оцінка моделі">SkyIndex</th>
-                        <th data-tooltip="Дата, на яку зібрані ці дані">Дата</th>
+                        <th style="width: 80px;" data-tooltip="Біржовий тикер акції або ETF">Symbol</th>
+                        <th style="width: 170px;" data-tooltip="Галузь, до якої належить компанія">Sector</th>
+                        <th style="width: 55px;" data-tooltip="Рейтинг Zacks від 1 (сильна покупка) до 5 (продаж)">Zacks</th>
+                        <th class="tipranks-col" style="width: 90px;">TipRanks</th>
+                        <th class="sector-growth" data-tooltip="Зміна ціни галузевого ETF за певний період">Sector Growth</th>
+                        <th class="eps-growth" data-tooltip="Ріст прибутку на акцію за рік або квартал">EPS Growth</th>
+                        <th class="revenue-growth" data-tooltip="Зростання виручки компанії">Revenue Growth</th>
+                        <th class="pe-ratio" data-tooltip="Співвідношення ціни до прибутку">PE Ratio</th>
+                        <th class="volume-change" data-tooltip="Зміна обсягу торгів за добу">Volume Change</th>
+                        <th style="width: 60px;" data-tooltip="Підсумкова оцінка моделі">SkyIndex</th>
+                        <th style="width: 90px;" data-tooltip="Дата, на яку зібрані ці дані">Дата</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -138,7 +141,7 @@
                             </select>
                         </td>
                         <td><input type="text" class="zacks-output" name="zacks_{{ i }}" value="{{ row['Zacks'] }}"></td>
-                        <td><input type="text" name="tipranks_{{ i }}" value="{{ row['TipRanks'] }}"></td>
+                        <td class="tipranks-col"><input type="text" name="tipranks_{{ i }}" value="{{ row['TipRanks'] }}"></td>
                         <td><input type="text" class="sector-growth" name="sector_growth_{{ i }}" value="{{ row['Sector Growth'] }}"></td>
                         <td><input type="text" class="eps-growth" name="eps_growth_{{ i }}" value="{{ row['EPS Growth'] }}"></td>
                         <td><input type="text" class="revenue-growth" name="revenue_growth_{{ i }}" value="{{ row['Revenue Growth'] }}"></td>
