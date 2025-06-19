@@ -95,10 +95,6 @@ def process_index_form(req: Request, default_count: int = 5):
                     "sector_growth_1d": sg1,
                     "sector_growth_3d": sg3,
                     "sector_growth_7d": sg7,
-                    "EPS Growth": rows[i].get("EPS Growth"),
-                    "Revenue Growth": rows[i].get("Revenue Growth"),
-                    "PE Ratio": rows[i].get("PE Ratio"),
-                    "Volume Change": rows[i].get("Volume Change"),
                     "Дата": datetime.today().strftime("%Y-%m-%d"),
                 }
 

@@ -88,14 +88,6 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         except ValueError:
             pass
 
-    # --- PE Ratio ---
-    pe_raw = _get_value(row, 'pe_ratio', 'PE Ratio')
-    pe_norm: Optional[float] = None
-    pe_val = _parse_float(pe_raw)
-    if pe_val is not None:
-        # Values below 25 are considered good, above 50 very bad
-        pe_norm = round(_clamp(1 - (pe_val / 25)), 4)
-
     # --- Percent-based metrics ---
     def percent_norm(key1: str, key2: str) -> Optional[float]:
         raw = _get_value(row, key1, key2)
@@ -114,19 +106,13 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         _get_value(row, 'sector_growth_7d'), SCALE_7D
     )
 
-    eps_growth_norm = percent_norm('eps_growth', 'EPS Growth')
-    revenue_growth_norm = percent_norm('revenue_growth', 'Revenue Growth')
-    volume_change_norm = percent_norm('volume_change', 'Volume Change')
+
 
     metrics = {
         'zacks_rank_norm': zacks_norm,
-        'pe_ratio_norm': pe_norm,
         'sector_growth_1d_norm': sector_growth_1d_norm,
         'sector_growth_3d_norm': sector_growth_3d_norm,
         'sector_growth_7d_norm': sector_growth_7d_norm,
-        'eps_growth_norm': eps_growth_norm,
-        'revenue_growth_norm': revenue_growth_norm,
-        'volume_change_norm': volume_change_norm,
     }
 
     # If all normalized values are None → treat row as invalid
