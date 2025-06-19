@@ -1,5 +1,5 @@
 import datetime
-import math
+from math import tanh
 from typing import Any, Dict, Optional
 
 from .rating import calculate_skyindex_score
@@ -33,13 +33,13 @@ def _tanh_percent(value: Any, scale: float) -> Optional[float]:
 
     ``value`` may contain a string with a trailing ``%``. The numeric
     component is divided by 100 and then by ``scale`` before applying
-    ``math.tanh``. The result is clamped to [-1, 1].
+    ``tanh``. The result is clamped to [-1, 1].
     """
     val = _parse_float(value)
     if val is None:
         return None
     try:
-        normalized = math.tanh((val / 100.0) / scale)
+        normalized = tanh((val / 100.0) / scale)
     except Exception:
         return None
     return round(_clamp(normalized), 4)
@@ -88,6 +88,17 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         except ValueError:
             pass
 
+    # --- TipRanks SmartScore ---
+    tip_raw = _get_value(row, 'tipranks', 'TipRanks')
+    tipranks_score_norm: Optional[float] = None
+    if tip_raw is not None:
+        try:
+            t_val = float(str(tip_raw).strip())
+            if 1 <= t_val <= 10:
+                tipranks_score_norm = round(_clamp(tanh((t_val - 5.0) / 2.0)), 4)
+        except ValueError:
+            pass
+
     # --- Percent-based metrics ---
     def percent_norm(key1: str, key2: str) -> Optional[float]:
         raw = _get_value(row, key1, key2)
@@ -110,6 +121,7 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     metrics = {
         'zacks_rank_norm': zacks_norm,
+        'tipranks_score_norm': tipranks_score_norm,
         'sector_growth_1d_norm': sector_growth_1d_norm,
         'sector_growth_3d_norm': sector_growth_3d_norm,
         'sector_growth_7d_norm': sector_growth_7d_norm,
