@@ -11,6 +11,7 @@ from config.constants import HEADERS
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
 from .fetch_service import parse_data
+from .metrics_cache import metrics_cache
 
 # Prefetch sector growth metrics on startup
 sector_growth_loaded = load_sector_growth()
@@ -51,21 +52,17 @@ def process_index_form(req: Request, default_count: int = 5):
                 rows[i][key] = req.form.get(form_key, "")
 
             if action == "data_search" and symbol:
-                # Підтягуємо з кешу, якщо вручну не вказано
-                if not rows[i].get("Sector"):
-                    cached_sector = get_sector_from_cache(symbol)
-                    if cached_sector:
-                        rows[i]["Sector"] = cached_sector
+                sector = rows[i].get("Sector", "") or get_sector_from_cache(symbol) or ""
 
-                # Основний парсинг
-                parsed = parse_data(symbol)
+                # Основний парсинг з кешуванням
+                parsed = parse_data(symbol, sector)
                 for key, value in parsed.items():
                     if key == "Sector" and rows[i].get("Sector"):
                         continue
                     rows[i][key] = value
 
                 # Якщо є сектор — додаємо Sector Growth
-                sector = rows[i].get("Sector")
+                sector = rows[i].get("Sector") or sector
                 if sector:
                     rows[i]["Sector Growth"] = get_sector_growth(sector)
 
@@ -73,8 +70,16 @@ def process_index_form(req: Request, default_count: int = 5):
 
             elif action == "calculate":
                 sector = rows[i].get("Sector", "").strip()
-                if symbol and sector:
-                    add_sector(symbol, sector)
+                if not symbol or not sector:
+                    rows[i]["row_class"] = "row-error"
+                    continue
+
+                metrics = metrics_cache.get(symbol)
+                if not metrics:
+                    rows[i]["row_class"] = "row-error"
+                    continue
+
+                add_sector(symbol, sector)
 
                 sector_growth = rows[i].get("Sector Growth", "")
                 if sector and not sector_growth:
@@ -88,7 +93,8 @@ def process_index_form(req: Request, default_count: int = 5):
                 row_data = {
                     "Symbol": symbol,
                     "Sector": sector,
-                    "Zacks": rows[i].get("Zacks"),
+                    "Zacks": metrics.get("zacks"),
+                    "TipRanks": metrics.get("tipranks"),
                     "Sector Growth 1d": sg1,
                     "Sector Growth 3d": sg3,
                     "Sector Growth 7d": sg7,
