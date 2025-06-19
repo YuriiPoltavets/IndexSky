@@ -42,7 +42,7 @@ def _tanh_percent(value: Any, scale: float) -> Optional[float]:
         normalized = math.tanh((val / 100.0) / scale)
     except Exception:
         return None
-    return _clamp(normalized)
+    return round(_clamp(normalized), 4)
 
 
 def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -84,7 +84,7 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         try:
             z_int = int(str(zacks_raw).strip())
             if 1 <= z_int <= 5:
-                zacks_norm = _clamp((3 - z_int) / 2)
+                zacks_norm = round(_clamp((3 - z_int) / 2), 4)
         except ValueError:
             pass
 
@@ -94,14 +94,14 @@ def normalize_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     pe_val = _parse_float(pe_raw)
     if pe_val is not None:
         # Values below 25 are considered good, above 50 very bad
-        pe_norm = _clamp(1 - (pe_val / 25))
+        pe_norm = round(_clamp(1 - (pe_val / 25)), 4)
 
     # --- Percent-based metrics ---
     def percent_norm(key1: str, key2: str) -> Optional[float]:
         raw = _get_value(row, key1, key2)
         val = _parse_float(raw)
         if val is not None:
-            return _clamp(val / 100)
+            return round(_clamp(val / 100), 4)
         return None
 
     sector_growth_1d_norm = _tanh_percent(
