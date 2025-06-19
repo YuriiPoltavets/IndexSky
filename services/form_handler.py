@@ -10,19 +10,13 @@ from sector_growth_cache import (
 from config.constants import HEADERS
 from logic.normalization import normalize_row
 from logic.save_handler import save_row
-from fetchers.tipranks import TipranksFetcher
-
-tipranks_fetcher = TipranksFetcher()
-# HEADERS is provided via config.constants
 from .fetch_service import parse_data
 
 # Prefetch sector growth metrics on startup
 sector_growth_loaded = load_sector_growth()
 
 
-
 def field_name(key: str) -> str:
-    """Convert a table header into a form field name."""
     return key.lower().replace(" ", "_")
 
 
@@ -37,7 +31,6 @@ def empty_row():
 
 
 def process_index_form(req: Request, default_count: int = 5):
-    """Handle index form submission and return a list of rows."""
     rows_count = default_count
     if req.method == "POST" and req.form.get("rows_count"):
         try:
@@ -57,27 +50,21 @@ def process_index_form(req: Request, default_count: int = 5):
                 form_key = f"{field_name(key)}_{i}"
                 rows[i][key] = req.form.get(form_key, "")
 
-            sector = rows[i].get("Sector", "").strip()
-
-            if action in ("data_search", "calculate") and symbol and sector:
-                add_sector(symbol, sector)
-
             if action == "data_search" and symbol:
+                # Підтягуємо з кешу, якщо вручну не вказано
                 if not rows[i].get("Sector"):
                     cached_sector = get_sector_from_cache(symbol)
                     if cached_sector:
                         rows[i]["Sector"] = cached_sector
 
+                # Основний парсинг
                 parsed = parse_data(symbol)
                 for key, value in parsed.items():
                     if key == "Sector" and rows[i].get("Sector"):
                         continue
                     rows[i][key] = value
 
-                tip_data = tipranks_fetcher.fetch(symbol)
-                if tip_data.get("tipranks") is not None:
-                    rows[i]["TipRanks"] = tip_data["tipranks"]
-
+                # Якщо є сектор — додаємо Sector Growth
                 sector = rows[i].get("Sector")
                 if sector:
                     rows[i]["Sector Growth"] = get_sector_growth(sector)
@@ -85,14 +72,14 @@ def process_index_form(req: Request, default_count: int = 5):
                 rows[i]["Дата"] = datetime.today().strftime("%Y-%m-%d")
 
             elif action == "calculate":
-                if not symbol:
-                    continue
+                sector = rows[i].get("Sector", "").strip()
+                if symbol and sector:
+                    add_sector(symbol, sector)
 
-                sector = rows[i].get("Sector", "")
                 sector_growth = rows[i].get("Sector Growth", "")
-
                 if sector and not sector_growth:
                     rows[i]["Sector Growth"] = get_sector_growth(sector)
+
                 sg_data = get_sector_growth_data(sector) if sector else {}
                 sg1 = rows[i]["Sector Growth"]
                 sg3 = sg_data.get("3d", "")
@@ -120,16 +107,12 @@ def process_index_form(req: Request, default_count: int = 5):
                     rows[i]["row_class"] = "row-error"
                     continue
 
-                if symbol and sector:
-                    add_sector(symbol, sector)
-
                 save_res = save_row(normalized)
                 rows[i]["skyindex_score"] = normalized.get("skyindex_score")
                 rows[i]["Дата"] = normalized.get("date")
 
-                if save_res.get("status") == "ok":
-                    rows[i]["row_class"] = "row-ok"
-                else:
-                    rows[i]["row_class"] = "row-error"
+                rows[i]["row_class"] = (
+                    "row-ok" if save_res.get("status") == "ok" else "row-error"
+                )
 
     return rows
