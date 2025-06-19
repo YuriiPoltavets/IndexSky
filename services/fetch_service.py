@@ -1,20 +1,22 @@
 from datetime import datetime
 from typing import Optional, Dict
 
+from .metrics_cache import metrics_cache
+
 from fetchers.manager import FetcherManager
-from fetchers.zacks import ZacksFetcher
-from fetchers.tipranks import TipranksFetcher
 from fetchers.yfinance_data import get_sector_yf
 from sector_manager import get_sector_from_cache
 from sector_growth_cache import get_sector_growth
 
 fetcher_manager = FetcherManager()
-zacks_fetcher = ZacksFetcher()
-tipranks_fetcher = TipranksFetcher()
 
 
 def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int] = None) -> Dict:
-    """Fetch metrics for a single stock symbol and assemble JSON response."""
+    """Fetch metrics for a single stock symbol and assemble JSON response.
+
+    Parsed metrics are stored in ``metrics_cache`` for later use by the
+    ``calculate`` step.
+    """
     if not symbol or not str(symbol).strip():
         raise ValueError("Symbol is required")
 
@@ -39,13 +41,29 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
         except Exception:
             sector_growth = ""
 
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    # Update global cache with all fetched metrics
+    metrics_cache.pop(symbol, None)
+    metrics_cache[symbol] = {
+        "symbol": symbol,
+        "zacks": zacks,
+        "tipranks": tipranks,
+        "sector": sector,
+        "date": today,
+        **{k: v for k, v in fetched.items() if k not in {"zacks", "tipranks"}},
+    }
+
+    valid = bool(sector and zacks is not None and tipranks is not None)
+
     result = {
         "symbol": symbol,
         "zacks": zacks,
         "tipranks": tipranks,
         "sector": sector,
         "sector_growth": sector_growth,
-        "date": datetime.today().strftime("%Y-%m-%d"),
+        "date": today,
+        "row_class": "row-ok" if valid else "row-error",
     }
 
     if row_index is not None:
@@ -54,32 +72,20 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     return result
 
 
-def parse_data(symbol: str) -> Dict:
-    """Return basic info about the given symbol for form prefilling."""
+def parse_data(symbol: str, sector: str = "") -> Dict:
+    """Return basic info about the given symbol for form prefilling.
+
+    This function reuses ``build_stock_response`` so that caching logic is
+    consistent between the AJAX and fallback form workflows.
+    """
     if not symbol:
         return {}
 
-    zacks_data = zacks_fetcher.fetch(symbol)
-    tipranks_data = tipranks_fetcher.fetch(symbol)
-
-    rank = zacks_data.get("zacks") if zacks_data else ""
-    tip_val = tipranks_data.get("tipranks") if tipranks_data else ""
-    if isinstance(tip_val, (int, float)):
-        print(f"🎯 TipRanks score parsed: {tip_val}")
-
-    sector = get_sector_from_cache(symbol)
-    if sector is None:
-        try:
-            sector = get_sector_yf(symbol)
-        except Exception:
-            sector = ""
-
-    if not isinstance(sector, str):
-        sector = ""
+    result = build_stock_response(symbol, sector)
 
     return {
-        "Sector": sector or "",
-        "Zacks": rank,
-        "TipRanks": tip_val,
-        "Sector Growth": "",
+        "Sector": result.get("sector", ""),
+        "Zacks": result.get("zacks"),
+        "TipRanks": result.get("tipranks"),
+        "Sector Growth": result.get("sector_growth", ""),
     }
