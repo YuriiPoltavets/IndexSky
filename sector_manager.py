@@ -8,7 +8,7 @@ FILE_PATH = os.path.join(os.path.dirname(__file__), CUSTOM_SECTOR_PATH)
 
 
 def load_custom_sectors() -> Dict[str, str]:
-    """Load user defined sector mappings from JSON file.
+    """Load user-defined sector mappings from JSON file.
 
     Returns an empty dict if the file does not exist, is invalid or any
     error occurs. Creates the file if it's missing.
@@ -42,12 +42,18 @@ def save_custom_sectors(data: Dict[str, str]) -> None:
 
 def get_sector_from_cache(symbol: str) -> Optional[str]:
     """Return cached sector for the provided symbol if available."""
+    symbol = symbol.strip().upper()
     data = load_custom_sectors()
     return data.get(symbol)
 
 
 def add_sector(symbol: str, sector: str) -> None:
     """Add or update a symbol-to-sector mapping and persist it."""
+    symbol = symbol.strip().upper()
+    sector = sector.strip()
+    if not symbol or not sector:
+        return
+
     data = load_custom_sectors()
     if data.get(symbol) != sector:
         data[symbol] = sector
