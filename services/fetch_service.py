@@ -18,7 +18,7 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     if not symbol or not str(symbol).strip():
         raise ValueError("Symbol is required")
 
-    symbol = str(symbol).strip().upper() 
+    symbol = str(symbol).strip().upper()
     if not sector:
         sector = get_sector_from_cache(symbol) or get_sector_yf(symbol) or ""
 
@@ -29,6 +29,8 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
 
     tip_val = fetched.get("tipranks")
     tipranks = int(tip_val) if isinstance(tip_val, (int, float)) else None
+    if tipranks is not None:
+        print(f"🎯 TipRanks score parsed: {tipranks}")
 
     eps_val = fetched.get("eps")
     eps = eps_val if isinstance(eps_val, (int, float)) else None
@@ -50,7 +52,7 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
             sector_growth = ""
 
     result = {
-        "symbol": symbol, 
+        "symbol": symbol,
         "zacks": zacks,
         "tipranks": tipranks,
         "sector": sector,
@@ -77,6 +79,9 @@ def parse_data(symbol: str) -> Dict:
     tipranks_data = tipranks_fetcher.fetch(symbol)
 
     rank = zacks_data.get("zacks") if zacks_data else ""
+    tip_val = tipranks_data.get("tipranks") if tipranks_data else ""
+    if isinstance(tip_val, (int, float)):
+        print(f"🎯 TipRanks score parsed: {tip_val}")
 
     sector = get_sector_from_cache(symbol)
     if sector is None:
@@ -91,7 +96,7 @@ def parse_data(symbol: str) -> Dict:
     return {
         "Sector": sector or "",
         "Zacks": rank,
-        "TipRanks": tipranks_data.get("tipranks") if tipranks_data else "",
+        "TipRanks": tip_val,
         "Sector Growth": "",
         "EPS Growth": "",
         "Revenue Growth": "",
