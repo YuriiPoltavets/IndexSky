@@ -3,8 +3,6 @@ import { fetchRowData } from './fetchRow.js';
 import { hasRequiredFields } from './validators.js';
 import { fillRowWithData, setRowStatus } from './domUtils.js';
 
-// Test message to verify console override
-console.log('🔧 Test');
 
 async function onDataSearch(event) {
   event.preventDefault();
