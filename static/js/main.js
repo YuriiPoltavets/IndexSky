@@ -1,4 +1,11 @@
-import { FETCH_DELAY_MS, CLASS_SUCCESS, CLASS_ERROR, CLASS_OK_BLUE } from './constants.js';
+import {
+  FETCH_DELAY_MS,
+  LOGIC_OK,
+  LOGIC_ERROR,
+  STYLE_SUCCESS,
+  STYLE_ERROR,
+  STYLE_OK_BLUE
+} from './constants.js';
 import { fetchRowData } from './fetchRow.js';
 import { hasRequiredFields } from './validators.js';
 import { fillRowWithData, setRowStatus, isRowEmpty } from './domUtils.js';
@@ -24,21 +31,15 @@ async function onDataSearch(event) {
       const data = response.data || response;
       fillRowWithData(row, data);
 
-      const valid = data.row_class ? data.row_class === 'row-ok' : hasRequiredFields({
-        sector: data.sector,
-        zacks: data.zacks,
-        tipranks: data.tipranks,
-        sector_growth: data.sector_growth
-      });
-
-      if (valid) {
-        setRowStatus(row, CLASS_OK_BLUE, '🔍 OK');
+      const isError = data.row_class === LOGIC_ERROR;
+      if (isError) {
+        setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
       } else {
-        setRowStatus(row, CLASS_ERROR, '❌ Error');
+        setRowStatus(row, LOGIC_OK, STYLE_OK_BLUE, '🔍 OK');
       }
     } catch (err) {
       console.error('Fetch row failed', err);
-      setRowStatus(row, CLASS_ERROR, '❌ Error');
+      setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
     }
 
     await new Promise(r => setTimeout(r, FETCH_DELAY_MS));
@@ -63,9 +64,9 @@ function handleCalculate(event) {
 
     const ok = hasRequiredFields(data);
     if (ok) {
-      setRowStatus(row, CLASS_SUCCESS, '✅ OK');
+      setRowStatus(row, LOGIC_OK, STYLE_SUCCESS, '✅ OK');
     } else {
-      setRowStatus(row, CLASS_ERROR, '❌ Error');
+      setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
     }
   }
 }

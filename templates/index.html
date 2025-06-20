@@ -139,19 +139,8 @@
             outline: none;
         }
 
-        .row-ok {
-            background-color: #1b4d37;
-            color: #12d67d;
-            font-weight: 600;
-            box-shadow: inset 0 0 10px #12d67d99;
-        }
-
-        .row-error {
-            background-color: #5b2a2a;
-            color: #ff8484;
-            font-weight: 600;
-            box-shadow: inset 0 0 10px #ff848499;
-        }
+        .row-ok {}
+        .row-error {}
 
         tr.row-ok input,
         tr.row-ok select {
@@ -277,7 +266,7 @@
                 <tbody>
                     {% for row in rows %}
                     {% set i = loop.index0 %}
-                    <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="">
+                    <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="{{ row['row_class'] }}">
                         <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
                         <td>
                             <select name="sector_{{ i }}" class="sector-select">
