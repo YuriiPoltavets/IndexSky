@@ -1,4 +1,4 @@
-import { CLASS_SUCCESS, CLASS_ERROR, CLASS_OK_BLUE } from './constants.js';
+import { LOGIC_OK, LOGIC_ERROR, STYLE_SUCCESS, STYLE_ERROR, STYLE_OK_BLUE } from './constants.js';
 
 export function fillRowWithData(row, data) {
   const { symbol, sector, zacks, tipranks, sector_growth, date } = data;
@@ -33,14 +33,20 @@ export function isRowEmpty(row) {
   return fields.every(el => !el.value);
 }
 
-export function setRowStatus(row, statusClass, statusText = '') {
-  const all = [CLASS_SUCCESS, CLASS_ERROR, CLASS_OK_BLUE];
-  row.classList.remove(...all);
-  if (statusClass) {
-    row.classList.add(statusClass);
-    row.dataset.status = statusClass;
+export function setRowStatus(row, logicClass, styleClass, statusText = '') {
+  const logicClasses = [LOGIC_OK, LOGIC_ERROR];
+  const styleClasses = [STYLE_SUCCESS, STYLE_ERROR, STYLE_OK_BLUE];
+  row.classList.remove(...logicClasses, ...styleClasses);
+
+  if (logicClass) {
+    row.classList.add(logicClass);
+    row.dataset.status = logicClass;
   } else {
     delete row.dataset.status;
+  }
+
+  if (styleClass) {
+    row.classList.add(styleClass);
   }
 
   if (statusText !== undefined) {
