@@ -2,7 +2,7 @@ import json
 import time
 import random
 import requests
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from config.delays import TIPRANKS_DELAY
 from .base_fetcher import BaseFetcher
@@ -15,19 +15,23 @@ USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.101 Safari/537.36",
 ]
 
+_PROXY_LOAD_ERROR = ""
+
 def load_authorized_proxies(path: str = "proxies_auth.json") -> list[dict]:
+    global _PROXY_LOAD_ERROR
     try:
         with open(path, "r", encoding="utf-8") as f:
+            _PROXY_LOAD_ERROR = ""
             return json.load(f)
     except Exception as e:
-        print(f"❌ Не вдалося завантажити авторизовані проксі: {e}")
+        _PROXY_LOAD_ERROR = str(e)
         return []
 
 class TipranksFetcher(BaseFetcher):
     current_ua_index = 0
     proxies = load_authorized_proxies()
 
-    def fetch(self, symbol: str) -> Dict[str, Optional[float]]:
+    def fetch(self, symbol: str, log_list: Optional[List[str]] = None) -> Dict[str, Optional[float]]:
         if not symbol:
             return {"tipranks": None}
 
@@ -35,7 +39,8 @@ class TipranksFetcher(BaseFetcher):
         print(f"\n🔎 TipRanks for symbol: {symbol.upper()}")
 
         if not self.proxies:
-            print("⛔ Проксі список порожній")
+            if log_list is not None and _PROXY_LOAD_ERROR:
+                log_list.append(f"{symbol} ❌ Не вдалося завантажити авторизовані проксі: {_PROXY_LOAD_ERROR}")
             return {"tipranks": None}
 
         for attempt in range(len(USER_AGENTS)):
@@ -71,7 +76,8 @@ class TipranksFetcher(BaseFetcher):
                     return {"tipranks": None}
 
                 if "<html" in response.text.lower():
-                    print("⚠️ Отримано HTML замість JSON — міняємо User-Agent")
+                    if log_list is not None:
+                        log_list.append(f"{symbol} ⚠️ Отримано HTML замість JSON")
                     self.current_ua_index = (self.current_ua_index + 1) % len(USER_AGENTS)
                     continue
 
@@ -79,7 +85,8 @@ class TipranksFetcher(BaseFetcher):
                     data = response.json()
                     print("📦 JSON розпарсено")
                 except json.JSONDecodeError:
-                    print("❌ JSON помилка")
+                    if log_list is not None:
+                        log_list.append(f"{symbol} ❌ JSON помилка")
                     return {"tipranks": None}
 
                 stocks = data.get("models", {}).get("stocks", [])
@@ -91,7 +98,8 @@ class TipranksFetcher(BaseFetcher):
                             print(f"🎯 SmartScore знайдено: {score}")
                             return {"tipranks": float(score)}
 
-                print("⚠️ SmartScore не знайдено")
+                if log_list is not None:
+                    log_list.append(f"{symbol} ⚠️ SmartScore не знайдено")
                 return {"tipranks": None}
 
             except Exception as e:

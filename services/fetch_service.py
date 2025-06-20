@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from .metrics_cache import metrics_cache
 
@@ -11,7 +11,12 @@ from sector_growth_cache import get_sector_growth
 fetcher_manager = FetcherManager()
 
 
-def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int] = None) -> Dict:
+def build_stock_response(
+    symbol: str,
+    sector: str = "",
+    row_index: Optional[int] = None,
+    log_messages: Optional[List[str]] = None,
+) -> Dict:
     """Fetch metrics for a single stock symbol and assemble JSON response.
 
     Parsed metrics are stored in ``metrics_cache`` for later use by the
@@ -24,7 +29,10 @@ def build_stock_response(symbol: str, sector: str = "", row_index: Optional[int]
     if not sector:
         sector = get_sector_from_cache(symbol) or get_sector_yf(symbol) or ""
 
-    fetched = fetcher_manager.fetch_all(symbol)
+    if log_messages is None:
+        fetched = fetcher_manager.fetch_all(symbol)
+    else:
+        fetched = fetcher_manager.fetch_all(symbol, log_messages)
 
     zacks_raw = fetched.get("zacks")
     zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None

@@ -20,7 +20,8 @@ def fetch_data():
         return jsonify({"error": "Symbol is required"}), 400
 
     try:
-        result = build_stock_response(symbol, sector=sector, row_index=row_index)
-        return jsonify(result)
+        log_messages: list[str] = []
+        result = build_stock_response(symbol, sector=sector, row_index=row_index, log_messages=log_messages)
+        return jsonify({"success": True, "data": result, "logs": log_messages})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
