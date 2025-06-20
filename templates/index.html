@@ -269,7 +269,9 @@
             <td class="status-label">
               {% if row['row_class'] == 'row-ok' %}
                 ✅ OK
-              {% elif row['row_class'] == 'row-error' %}
+              {% elif row['row_class'] == 'ok-blue' %}
+                🔍 OK
+              {% elif row['row_class'] == 'row-error' %}  
                 ❌ Error
               {% endif %}
             </td>
