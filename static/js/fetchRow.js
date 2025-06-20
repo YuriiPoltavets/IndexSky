@@ -9,5 +9,5 @@ export async function fetchRowData({ symbol, sector, rowIndex }) {
     throw new Error(`Request failed with status ${resp.status}`);
   }
 
-  return resp.json();
+  return await resp.json();
 }
