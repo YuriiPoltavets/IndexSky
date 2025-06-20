@@ -200,15 +200,21 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 150px;
-      background-color: #0d0d0d;
+      z-index: 999;
+      max-height: 150px;
+      overflow-y: auto;
+      padding-left: 12px;
+      padding-right: 12px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 -1px 6px rgba(0,0,0,0.5);
       color: #dcdcdc;
       font-family: monospace;
       font-size: 13px;
-      padding: 8px 12px;
-      border-top: 1px solid #333;
-      z-index: 999;
-      overflow-y: auto;
       white-space: pre-wrap;
     }
   </style>
@@ -283,9 +289,9 @@
     <button name="action" value="data_search">Data Search</button>
     <button name="action" value="calculate">Calculate</button>
   </form>
-
-  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <div id="console-log"></div>
+  <div style="height: 180px;"></div>
+
   <script>
     function appendToConsole(text) {
       const logEl = document.getElementById('console-log');
@@ -306,5 +312,6 @@
       };
     })(window.console.log);
   </script>
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
