@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 
 from services.form_handler import (
     process_index_form,
@@ -26,3 +26,13 @@ def index():
         sector_growth_loaded=sector_growth_loaded,
         logs=logs,
     )
+
+
+@index_bp.route('/api/logs')
+def get_logs():
+    logs = []
+    if sector_growth_loaded:
+        logs.append("✅ Sector Growth loaded")
+    else:
+        logs.append("⚠️ Sector Growth failed to load")
+    return jsonify(logs=logs)

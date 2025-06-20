@@ -46,7 +46,15 @@ async function onDataSearch(event) {
   }
 }
 
-document.querySelector('button[value="data_search"]')?.addEventListener('click', onDataSearch);
+const dataSearchBtn = document.querySelector('button[value="data_search"]');
+dataSearchBtn?.addEventListener('click', async (event) => {
+  await onDataSearch(event);
+  const res = await fetch('/api/logs');
+  const data = await res.json();
+  if (data.logs) {
+    data.logs.forEach(msg => console.log(msg));
+  }
+});
 
 function handleCalculate(event) {
   event.preventDefault();
