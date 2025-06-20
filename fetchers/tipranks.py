@@ -107,7 +107,7 @@ class TipranksFetcher(BaseFetcher):
                             return result
 
                 if log_list is not None:
-                    log_list.append(f"{symbol.upper()} ⚠️ SmartScore не знайдено")
+                    log_list.append(f"{symbol.upper()} ⚠️ TipRanks не знайдено")
                 result["row_class"] = "row-error"
                 return result
 
