@@ -283,6 +283,25 @@
   </form>
 
   <div id="console-log"></div>
+  <script>
+    function appendToConsole(text) {
+      const consoleEl = document.getElementById('console-log');
+      if (!consoleEl) return;
+      const now = new Date();
+      const timestamp = `[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] `;
+      const line = document.createElement('div');
+      line.textContent = timestamp + text;
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    window.console.log = (function(oldLog) {
+      return function(text) {
+        oldLog(text);
+        appendToConsole(String(text));
+      };
+    })(window.console.log);
+  </script>
 
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
