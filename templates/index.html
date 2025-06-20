@@ -1,348 +1,277 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>SKY INDEX</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+  <meta charset="UTF-8">
+  <title>SKY INDEX</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
-        body {
-            font-family: 'Inter', Arial, sans-serif;
-            background-color: #1e1e1e;
-            color: #f3f3f3;
-            padding: 20px;
-            padding-bottom: 150px; /* space for console panel */
-        }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: #1e1e1e;
+      color: #f3f3f3;
+      padding: 20px;
+    }
 
-        h1 {
-            color: #ffffff;
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
+    h1 {
+      color: #ffffff;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
 
-        .table-wrapper {
-            overflow-x: auto;
-            max-width: 100%;
-        }
+    .table-wrapper {
+      overflow-x: auto;
+      max-width: 100%;
+    }
 
-        table {
-            border-collapse: collapse;
-            margin-top: 20px;
-            table-layout: fixed;
-            width: 100%;
-            background-color: #2b2b2b;
-        }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      table-layout: fixed;
+      width: 100%;
+      background-color: #2b2b2b;
+    }
 
-        th, td {
-            border: 1px solid #444;
-            padding: 4px;
-            text-align: center;
-            background-color: #2b2b2b;
-        }
+    th, td {
+      border: 1px solid #444;
+      padding: 4px;
+      text-align: center;
+      background-color: #2b2b2b;
+    }
 
-        td, th, input, select {
-            text-align: center;
-        }
+    td, th, input, select {
+      text-align: center;
+    }
 
-        th {
-            background-color: #333;
-            color: #f3f3f3;
-        }
+    th {
+      background-color: #333;
+      color: #f3f3f3;
+    }
 
-        tbody tr:nth-child(odd) td {
-            background-color: #262626;
-        }
+    tbody tr:nth-child(odd) td {
+      background-color: #262626;
+    }
 
-        input, select {
-            width: 100%;
-            padding: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-            background-color: #2b2b2b;
-            border: 1px solid #444;
-            color: #f3f3f3;
-            border-radius: 8px;
-            transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
+    input, select {
+      width: 100%;
+      padding: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+      background-color: #2b2b2b;
+      border: 1px solid #444;
+      color: #f3f3f3;
+      border-radius: 8px;
+      transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
 
-        input:focus, select:focus {
-            outline: none;
-            box-shadow: 0 0 4px #10a37f;
-            border-color: #10a37f;
-        }
-        .symbol-input {
-            width: 80px;
-        }
-        .sector-select {
-            width: 170px;
-            font-size: 13px;
-        }
-        .zacks-output {
-            width: 55px;
-        }
-        .tipranks-col {
-            width: 90px;
-        }
-        .sector-growth {
-            width: 110px;
-        }
-        .eps-growth {
-            width: 110px;
-        }
-        .revenue-growth {
-            width: 110px;
-        }
-        .pe-ratio {
-            width: 80px;
-        }
-        .volume-change {
-            width: 110px;
-        }
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 0 4px #10a37f;
+      border-color: #10a37f;
+    }
 
-        tbody tr:nth-child(odd) td {
-            background-color: #262626;
-        }
-        th[data-tooltip] {
-            position: relative;
-        }
+    .symbol-input { width: 80px; }
+    .sector-select { width: 170px; font-size: 13px; }
+    .zacks-output { width: 55px; }
+    .tipranks-col { width: 90px; }
+    .sector-growth { width: 110px; }
+    .eps-growth { width: 110px; }
+    .revenue-growth { width: 110px; }
+    .pe-ratio { width: 80px; }
+    .volume-change { width: 110px; }
 
-        th[data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            background: #333;
-            color: #fff;
-            padding: 4px 6px;
-            white-space: nowrap;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 2;
-        }
-        button {
-            padding: 6px 12px;
-            font-size: 14px;
-            margin: 2px;
-            background-color: #10a37f;
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: filter 0.2s;
-        }
+    th[data-tooltip] {
+      position: relative;
+    }
 
-        button:hover {
-            filter: brightness(1.1);
-        }
+    th[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      background: #333;
+      color: #fff;
+      padding: 4px 6px;
+      white-space: nowrap;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 2;
+    }
 
-        button:focus {
-            outline: none;
-        }
+    button {
+      padding: 6px 12px;
+      font-size: 14px;
+      margin: 2px;
+      background-color: #10a37f;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
 
-        .row-ok {}
-        .row-error {}
+    button:hover {
+      filter: brightness(1.1);
+    }
 
-        tr.row-ok input,
-        tr.row-ok select {
-            background-color: #1b4d37;
-            border-color: #12d67d;
-            color: #eefaf5;
-        }
+    button:focus {
+      outline: none;
+    }
 
-        tr.row-error input,
-        tr.row-error select {
-            background-color: #5b2a2a;
-            border-color: #ff8484;
-            color: #ffecec;
-        }
+    .row-ok {}
+    .row-error {}
 
-        tr.row-ok input:focus,
-        tr.row-ok select:focus {
-            box-shadow: 0 0 6px #12d67d;
-            border-color: #12d67d;
-        }
+    tr.row-ok input,
+    tr.row-ok select {
+      background-color: #1b4d37;
+      border-color: #12d67d;
+      color: #eefaf5;
+    }
 
-        tr.row-error input:focus,
-        tr.row-error select:focus {
-            box-shadow: 0 0 6px #ff8484;
-            border-color: #ff8484;
-        }
+    tr.row-error input,
+    tr.row-error select {
+      background-color: #5b2a2a;
+      border-color: #ff8484;
+      color: #ffecec;
+    }
 
-        .status-label {
-            width: 80px;
-            font-weight: 600;
-        }
+    tr.row-ok input:focus,
+    tr.row-ok select:focus {
+      box-shadow: 0 0 6px #12d67d;
+      border-color: #12d67d;
+    }
 
-        .status-success { background-color: #144f3c; }
-        .status-error { background-color: #5a2a2a; }
-        .ok-blue { background-color: #203858; }
+    tr.row-error input:focus,
+    tr.row-error select:focus {
+      box-shadow: 0 0 6px #ff8484;
+      border-color: #ff8484;
+    }
 
-        tr.status-success td {
-            background-color: #144f3c;
-            color: #ffffff;
-        }
-        tr.status-error td {
-            background-color: #5a2a2a;
-            color: #ffffff;
-        }
-        tr.ok-blue td {
-            background-color: #203858;
-            color: #ffffff;
-        }
-        select[data-status="error"], input[data-status="error"] {
-            background-color: #512d2d;
-        }
-        .row-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
+    tr.ok-blue td,
+    tr.ok-blue input,
+    tr.ok-blue select {
+      background-color: #203858;
+      color: #ffffff;
+      border-color: #3c5f88;
+    }
 
-        .row-control input[type="number"] {
-            width: 60px;
-        }
+    tr.ok-blue input:focus,
+    tr.ok-blue select:focus {
+      box-shadow: 0 0 6px #3c7dd6;
+      border-color: #3c7dd6;
+    }
 
-        .status.success {
-            color: #10a37f;
-            font-weight: bold;
-        }
+    .status-label {
+      width: 80px;
+      font-weight: 600;
+    }
 
-        .status.error {
-            color: #e05d5d;
-            font-weight: bold;
-        }
+    .status-success { background-color: #144f3c; }
+    .status-error { background-color: #5a2a2a; }
 
-        #console-log {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 120px;
-            padding: 8px;
-            background-color: #2b2b2b;
-            color: #ccc;
-            font-family: monospace;
-            font-size: 13px;
-            overflow-y: hidden;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            box-sizing: border-box;
-            z-index: 100;
-        }
+    select[data-status="error"], input[data-status="error"] {
+      background-color: #512d2d;
+    }
 
-        #console-log:hover {
-            overflow-y: auto;
-        }
-    </style>
+    .row-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .row-control input[type="number"] {
+      width: 60px;
+    }
+
+    .status.success {
+      color: #14775e;
+      font-weight: bold;
+    }
+
+    .status.error {
+      color: #913434;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <h1>SKY INDEX 📑</h1>
-    <form method="POST">
-        <div class="row-control">
-            <label for="rows_count">Кількість рядків: </label>
-            <input type="number" id="rows_count" name="rows_count" min="1" max="50" value="{{ rows|length }}">
-            <button name="action" value="resize">Оновити</button>
-        </div>
+  <h1>SKY INDEX 📑</h1>
+  <form method="POST">
+    <div class="row-control">
+      <label for="rows_count">Кількість рядків: </label>
+      <input type="number" id="rows_count" name="rows_count" min="1" max="50" value="{{ rows|length }}">
+      <button name="action" value="resize">Оновити</button>
+    </div>
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 80px;" data-tooltip="Біржовий тикер акції або ETF">Symbol</th>
-                        <th style="width: 170px;" data-tooltip="Галузь, до якої належить компанія">Sector</th>
-                        <th style="width: 55px;" data-tooltip="Рейтинг Zacks від 1 (сильна покупка) до 5 (продаж)">Zacks</th>
-                        <th class="tipranks-col" style="width: 90px;">TipRanks</th>
-                        <th class="sector-growth" data-tooltip="Зміна ціни галузевого ETF за певний період">Sector Growth</th>
-                        <th class="eps-growth">1</th>
-                        <th class="revenue-growth">2</th>
-                        <th class="pe-ratio">3</th>
-                        <th class="volume-change">4</th>
-                        <th style="width: 60px;" data-tooltip="Підсумкова оцінка моделі">SkyIndex</th>
-                        <th style="width: 90px;" data-tooltip="Дата, на яку зібрані ці дані">Дата</th>
-                        <th class="status-label">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in rows %}
-                    {% set i = loop.index0 %}
-                    <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="{{ row['row_class'] }}">
-                        <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
-                        <td>
-                            <select name="sector_{{ i }}" class="sector-select">
-                                <option value="">-</option>
-                                {% for opt in sectors %}
-                                    <option value="{{ opt }}" {% if row['Sector'] == opt %}selected{% endif %}>{{ opt }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td><input type="text" class="zacks-output" name="zacks_{{ i }}" value="{{ row['Zacks'] }}"></td>
-                        <td class="tipranks-col"><input type="text" name="tipranks_{{ i }}" value="{{ row['TipRanks'] }}"></td>
-                        <td><input type="text" class="sector-growth" name="sector_growth_{{ i }}" value="{{ row['Sector Growth'] }}"></td>
-                        <td><input type="text" class="eps-growth"></td>
-                        <td><input type="text" class="revenue-growth"></td>
-                        <td><input type="text" class="pe-ratio"></td>
-                        <td><input type="text" class="volume-change"></td>
-                        <td style="width: 60px;">
-                            {% if row['skyindex_score'] is not none %}
-                                {{ '%.2f'|format(row['skyindex_score']) }}
-                            {% endif %}
-                        </td>
-                        <td class="date-cell" style="width: 90px;">{{ row['Дата'] }}</td>
-                        <td class="status-label">
-                            {% if row['row_class'] == 'row-ok' %}
-                                ✅ OK
-                            {% elif row['row_class'] == 'row-error' %}
-                                ❌ Error
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 80px;" data-tooltip="Біржовий тикер акції або ETF">Symbol</th>
+            <th style="width: 170px;" data-tooltip="Галузь, до якої належить компанія">Sector</th>
+            <th style="width: 55px;" data-tooltip="Рейтинг Zacks від 1 (сильна покупка) до 5 (продаж)">Zacks</th>
+            <th class="tipranks-col" style="width: 90px;">TipRanks</th>
+            <th class="sector-growth" data-tooltip="Зміна ціни галузевого ETF за певний період">Sector Growth</th>
+            <th class="eps-growth">1</th>
+            <th class="revenue-growth">2</th>
+            <th class="pe-ratio">3</th>
+            <th class="volume-change">4</th>
+            <th style="width: 60px;" data-tooltip="Підсумкова оцінка моделі">SkyIndex</th>
+            <th style="width: 90px;" data-tooltip="Дата, на яку зібрані ці дані">Дата</th>
+            <th class="status-label">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          {% set i = loop.index0 %}
+          <tr data-row-id="{{ i }}" class="{{ row['row_class'] }}" data-status="{{ row['row_class'] }}">
+            <td><input type="text" class="symbol-input" name="symbol_{{ i }}" value="{{ row['Symbol'] }}" autocomplete="off"></td>
+            <td>
+              <select name="sector_{{ i }}" class="sector-select">
+                <option value="">-</option>
+                {% for opt in sectors %}
+                  <option value="{{ opt }}" {% if row['Sector'] == opt %}selected{% endif %}>{{ opt }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="text" class="zacks-output" name="zacks_{{ i }}" value="{{ row['Zacks'] }}"></td>
+            <td class="tipranks-col"><input type="text" name="tipranks_{{ i }}" value="{{ row['TipRanks'] }}"></td>
+            <td><input type="text" class="sector-growth" name="sector_growth_{{ i }}" value="{{ row['Sector Growth'] }}"></td>
+            <td><input type="text" class="eps-growth"></td>
+            <td><input type="text" class="revenue-growth"></td>
+            <td><input type="text" class="pe-ratio"></td>
+            <td><input type="text" class="volume-change"></td>
+            <td>
+              {% if row['skyindex_score'] is not none %}
+                {{ '%.2f'|format(row['skyindex_score']) }}
+              {% endif %}
+            </td>
+            <td class="date-cell">{{ row['Дата'] }}</td>
+            <td class="status-label">
+              {% if row['row_class'] == 'row-ok' %}
+                ✅ OK
+              {% elif row['row_class'] == 'row-error' %}
+                ❌ Error
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-        <br>
-        <button name="action" value="data_search">Data Search</button>
-        <button name="action" value="calculate">Calculate</button>
-        
-    </form>
-    <div id="console-log"></div>
-    <script>
-        (function() {
-            const logDiv = document.getElementById('console-log');
-            const origLog = console.log.bind(console);
-            console.log = function(...args) {
-                const msg = args.map(a => {
-                    if (typeof a === 'object') {
-                        try { return JSON.stringify(a); } catch (e) { return '[object]'; }
-                    }
-                    return String(a);
-                }).join(' ');
-                const timestamp = new Date().toLocaleString('en-GB', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                }).replace(',', '');
-                const line = document.createElement('div');
-                line.textContent = `[${timestamp}] >     ${msg}`;
-                logDiv.appendChild(line);
-                logDiv.scrollTop = logDiv.scrollHeight;
-                origLog(...args);
-            };
-        })();
-        window.addEventListener('DOMContentLoaded', () => {
-            {% if sector_growth_loaded %}
-            console.log('✅ Sector Growth loaded');
-            {% else %}
-            console.log('⚠️ Sector Growth failed');
-            {% endif %}
-        });
-    </script>
-    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <br>
+    <button name="action" value="data_search">Data Search</button>
+    <button name="action" value="calculate">Calculate</button>
+
+    {% if sector_growth_loaded %}
+      <div class="status success">✅ Sector Growth loaded</div>
+    {% else %}
+      <div class="status error">⚠️ Sector Growth failed</div>
+    {% endif %}
+  </form>
+
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
