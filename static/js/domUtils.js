@@ -1,4 +1,4 @@
-import { CLASS_SUCCESS, CLASS_ERROR } from './constants.js';
+import { CLASS_SUCCESS, CLASS_ERROR, CLASS_OK_BLUE } from './constants.js';
 
 export function fillRowWithData(row, data) {
   const { symbol, sector, zacks, tipranks, sector_growth, date } = data;
@@ -28,12 +28,23 @@ export function fillRowWithData(row, data) {
 
 }
 
-export function setRowStatus(row, isSuccess) {
-  if (isSuccess) {
-    row.classList.add(CLASS_SUCCESS);
-    row.classList.remove(CLASS_ERROR);
+export function isRowEmpty(row) {
+  const fields = Array.from(row.querySelectorAll('input, select'));
+  return fields.every(el => !el.value);
+}
+
+export function setRowStatus(row, statusClass, statusText = '') {
+  const all = [CLASS_SUCCESS, CLASS_ERROR, CLASS_OK_BLUE];
+  row.classList.remove(...all);
+  if (statusClass) {
+    row.classList.add(statusClass);
+    row.dataset.status = statusClass;
   } else {
-    row.classList.add(CLASS_ERROR);
-    row.classList.remove(CLASS_SUCCESS);
+    delete row.dataset.status;
+  }
+
+  if (statusText !== undefined) {
+    const label = row.querySelector('.status-label');
+    if (label) label.textContent = statusText;
   }
 }
