@@ -99,7 +99,7 @@ class TipranksFetcher(BaseFetcher):
                             return {"tipranks": float(score)}
 
                 if log_list is not None:
-                    log_list.append(f"{symbol} ⚠️ SmartScore не знайдено")
+                    log_list.append(f"{symbol.upper()} ⚠️ SmartScore не знайдено")
                 return {"tipranks": None}
 
             except Exception as e:
