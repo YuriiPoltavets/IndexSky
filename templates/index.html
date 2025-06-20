@@ -196,16 +196,18 @@
     }
 
     #console-log {
-      background-color: #1a1a1a;
-      color: #d0d0d0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 150px;
+      background-color: #0d0d0d;
+      color: #dcdcdc;
       font-family: monospace;
       font-size: 13px;
-      line-height: 1.4;
-      margin-top: 16px;
       padding: 8px 12px;
-      border: 1px solid #333;
-      border-radius: 6px;
-      max-height: 200px;
+      border-top: 1px solid #333;
+      z-index: 999;
       overflow-y: auto;
       white-space: pre-wrap;
     }
@@ -282,27 +284,27 @@
     <button name="action" value="calculate">Calculate</button>
   </form>
 
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <div id="console-log"></div>
   <script>
     function appendToConsole(text) {
-      const consoleEl = document.getElementById('console-log');
-      if (!consoleEl) return;
+      const logEl = document.getElementById('console-log');
+      if (!logEl) return;
+
       const now = new Date();
       const timestamp = `[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] `;
       const line = document.createElement('div');
       line.textContent = timestamp + text;
-      consoleEl.appendChild(line);
-      consoleEl.scrollTop = consoleEl.scrollHeight;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
     }
 
-    window.console.log = (function(oldLog) {
-      return function(text) {
-        oldLog(text);
-        appendToConsole(String(text));
+    window.console.log = (function (originalLog) {
+      return function (...args) {
+        originalLog.apply(console, args);
+        appendToConsole(args.map(String).join(' '));
       };
     })(window.console.log);
   </script>
-
-  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
