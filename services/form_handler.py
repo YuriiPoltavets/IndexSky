@@ -65,7 +65,7 @@ def process_index_form(req: Request, default_count: int = 5):
                 if not parsed or parsed.get("Zacks") in (None, "", "N/A"):
                     rows[i]["row_class"] = "row-error"
                 else:
-                    rows[i]["row_class"] = "row-ok"
+                    rows[i]["row_class"] = "ok-blue"
 
                 # Якщо є сектор — додаємо Sector Growth
                 sector = rows[i].get("Sector") or sector
