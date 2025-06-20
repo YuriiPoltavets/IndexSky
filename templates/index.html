@@ -287,32 +287,24 @@
   <div id="console-log"></div>
 
   <script>
-    function appendToConsole(text) {
-      const logEl = document.getElementById('console-log');
-      if (!logEl) return;
+  function appendToConsole(text) {
+    const logEl = document.getElementById('console-log');
+    if (!logEl) return;
 
-      const now = new Date();
-      const timestamp = `[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] `;
-      const line = document.createElement('div');
-      line.textContent = timestamp + text;
-      logEl.appendChild(line);
-      logEl.scrollTop = logEl.scrollHeight;
-    }
+    const now = new Date();
+    const timestamp = `[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] `;
+    const line = document.createElement('div');
+    line.textContent = timestamp + text;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
 
-    window.console.log = (function (originalLog) {
-      return function (...args) {
-        originalLog.apply(console, args);
-        appendToConsole(args.map(String).join(' '));
-      };
-    })(window.console.log);
-
-    window.addEventListener('DOMContentLoaded', function () {
-      console.log('Console ready');
-      {% for msg in logs %}
-        console.log({{ msg | tojson }});
-      {% endfor %}
-    });
-  </script>
-  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  window.console.log = (function (originalLog) {
+    return function (...args) {
+      originalLog.apply(console, args);
+      appendToConsole(args.map(String).join(' '));
+    };
+  })(window.console.log);
+</script>
 </body>
 </html>
