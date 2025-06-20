@@ -118,6 +118,8 @@
       outline: none;
     }
 
+    .row-ok {}
+    .row-error {}
 
     tr.row-ok input,
     tr.row-ok select {
@@ -166,6 +168,7 @@
 
     .status-success { background-color: #144f3c; }
     .status-error { background-color: #5a2a2a; }
+    .ok-blue { background-color: #203858; }
 
     select[data-status="error"], input[data-status="error"] {
       background-color: #512d2d;
@@ -209,7 +212,7 @@
   </style>
 </head>
 <body>
-  <h1>SKY INDEX 📑</h1>
+  <h1>SKY INDEX 📁</h1>
   <form method="POST">
     <div class="row-control">
       <label for="rows_count">Кількість рядків: </label>
@@ -277,13 +280,8 @@
     <br>
     <button name="action" value="data_search">Data Search</button>
     <button name="action" value="calculate">Calculate</button>
-
-    {% if sector_growth_loaded %}
-      <div class="status success">✅ Sector Growth loaded</div>
-    {% else %}
-      <div class="status error">⚠️ Sector Growth failed</div>
-    {% endif %}
   </form>
+
   <div id="console-log"></div>
 
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
