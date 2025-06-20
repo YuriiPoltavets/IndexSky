@@ -13,10 +13,11 @@ index_bp = Blueprint('index_bp', __name__)
 def index():
     rows = process_index_form(request)
     logs: list[str] = []
-    if sector_growth_loaded:
-        logs.append("✅ Sector Growth loaded")
-    else:
-        logs.append("⚠️ Sector Growth failed to load")
+    if request.method == "POST" and request.form.get("action") == "data_search":
+        if sector_growth_loaded:
+            logs.append("✅ Sector Growth loaded")
+        else:
+            logs.append("⚠️ Sector Growth failed to load")
     return render_template(
         'index.html',
         headers=HEADERS,
