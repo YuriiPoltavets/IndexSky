@@ -17,7 +17,7 @@ def test_build_stock_response_caches_metrics():
          patch('services.fetch_service.get_sector_from_cache', return_value='Technology'), \
          patch('services.fetch_service.get_sector_yf', return_value='Technology'), \
          patch('services.fetch_service.get_sector_growth', return_value='1%'):
-        fm.fetch_all.return_value = {'zacks': '2', 'tipranks': 9}
+        fm.fetch_all.return_value = {'zacks': '2', 'tipranks': 9, 'row_class': 'row-ok'}
         result = build_stock_response('aapl', row_index=1)
 
     assert result['zacks'] == 2

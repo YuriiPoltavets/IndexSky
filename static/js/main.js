@@ -23,7 +23,19 @@ async function onDataSearch(event) {
       }
       const data = response.data || response;
       fillRowWithData(row, data);
-      setRowStatus(row, CLASS_OK_BLUE, '🔍 OK');
+
+      const valid = data.row_class ? data.row_class === 'row-ok' : hasRequiredFields({
+        sector: data.sector,
+        zacks: data.zacks,
+        tipranks: data.tipranks,
+        sector_growth: data.sector_growth
+      });
+
+      if (valid) {
+        setRowStatus(row, CLASS_OK_BLUE, '🔍 OK');
+      } else {
+        setRowStatus(row, CLASS_ERROR, '❌ Error');
+      }
     } catch (err) {
       console.error('Fetch row failed', err);
       setRowStatus(row, CLASS_ERROR, '❌ Error');

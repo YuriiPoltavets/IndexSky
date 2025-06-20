@@ -15,8 +15,10 @@ class ZacksFetcher(BaseFetcher):
     """Fetch the Zacks rank for a stock symbol."""
 
     def fetch(self, symbol: str) -> Dict[str, str]:
-        """Return the Zacks rank as a dictionary."""
+        """Return the Zacks rank as a dictionary with status class."""
         time.sleep(random.uniform(ZACKS_DELAY - 0.9, ZACKS_DELAY))
+
+        result: Dict[str, str] = {"row_class": "row-ok", "zacks": "error"}
 
         urls = [
             f"https://www.zacks.com/stock/quote/{symbol}?q={symbol}",
@@ -35,17 +37,21 @@ class ZacksFetcher(BaseFetcher):
                 soup = BeautifulSoup(response.text, "html.parser")
 
                 if soup.find("span", class_="rankrect_NA"):
-                    return {"zacks": "0"}
+                    result["zacks"] = "0"
+                    return result
 
                 for i in range(1, 6):
                     span = soup.find("span", class_=f"rank_chip rankrect_{i}")
                     if span and span.text.strip().isdigit():
-                        return {"zacks": span.text.strip()}
+                        result["zacks"] = span.text.strip()
+                        return result
             except Exception as e:
                 print(f"[!] Error parsing {symbol}: {e}")
+                result["row_class"] = "row-error"
                 continue
 
-        return {"zacks": "error"}
+        result["row_class"] = "row-error"
+        return result
 
 
 # Backward compatible function alias

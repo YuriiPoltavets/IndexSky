@@ -19,7 +19,7 @@ class FetcherManager:
 
     def fetch_all(self, symbol: str, log_list: Optional[List[str]] = None) -> Dict:
         """Fetch data from all providers and merge the results."""
-        result: Dict = {}
+        result: Dict = {"row_class": "row-ok"}
         for fetcher in self.fetchers:
             try:
                 if isinstance(fetcher, TipranksFetcher):
@@ -27,7 +27,10 @@ class FetcherManager:
                 else:
                     data = fetcher.fetch(symbol)
                 if isinstance(data, dict):
-                    result.update(data)
+                    if data.get("row_class") == "row-error":
+                        result["row_class"] = "row-error"
+                    result.update({k: v for k, v in data.items() if k != "row_class"})
             except Exception as exc:
                 print(f"Error in {fetcher.__class__.__name__}: {exc}")
+                result["row_class"] = "row-error"
         return result
