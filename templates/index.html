@@ -11,6 +11,7 @@
             background-color: #1e1e1e;
             color: #f3f3f3;
             padding: 20px;
+            padding-bottom: 150px; /* space for console panel */
         }
 
         h1 {
@@ -208,6 +209,28 @@
             color: #e05d5d;
             font-weight: bold;
         }
+
+        #console-log {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            padding: 8px;
+            background-color: #2b2b2b;
+            color: #ccc;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: hidden;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        #console-log:hover {
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -285,6 +308,26 @@
           <div class="status error">⚠️ Sector Growth failed</div>
         {% endif %}
     </form>
+    <div id="console-log"></div>
+    <script>
+        (function() {
+            const logDiv = document.getElementById('console-log');
+            const origLog = console.log.bind(console);
+            console.log = function(...args) {
+                const msg = args.map(a => {
+                    if (typeof a === 'object') {
+                        try { return JSON.stringify(a); } catch (e) { return '[object]'; }
+                    }
+                    return String(a);
+                }).join(' ');
+                const line = document.createElement('div');
+                line.textContent = '> ' + msg;
+                logDiv.appendChild(line);
+                logDiv.scrollTop = logDiv.scrollHeight;
+                origLog(...args);
+            };
+        })();
+    </script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
