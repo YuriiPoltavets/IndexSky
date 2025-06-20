@@ -30,6 +30,9 @@ async function onDataSearch(event) {
       }
       const data = response.data || response;
       fillRowWithData(row, data);
+  if (data.row_class === 'ok-blue') {
+    setRowStatus(row, 'ok-blue', STYLE_OK_BLUE, '🔍 OK');
+  }
 
       const isError = data.row_class === LOGIC_ERROR;
       if (isError) {
