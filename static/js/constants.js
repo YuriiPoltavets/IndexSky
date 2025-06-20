@@ -7,4 +7,5 @@ export const REQUIRED_FIELDS = [
 
 export const CLASS_SUCCESS = 'status-success';
 export const CLASS_ERROR = 'status-error';
+export const CLASS_OK_BLUE = 'ok-blue';
 export const FETCH_DELAY_MS = 300;
