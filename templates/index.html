@@ -295,8 +295,6 @@
       consoleEl.scrollTop = consoleEl.scrollHeight;
     }
 
-    window.console.log = (function(oldLog) {
-      return function(text) {
         oldLog(text);
         appendToConsole(String(text));
       };
