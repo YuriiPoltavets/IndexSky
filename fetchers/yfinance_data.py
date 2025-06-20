@@ -28,18 +28,31 @@ class YFinanceFetcher(BaseFetcher):
     """Fetch basic financial metrics using yfinance."""
 
     def fetch(self, symbol: str) -> Dict[str, Optional[float]]:
-        ticker = yf.Ticker(symbol)
-        info = ticker.info
-        eps = info.get("trailingEps") or info.get("epsTrailingTwelveMonths")
-        revenue = info.get("totalRevenue")
-        pe_ratio = info.get("trailingPE") or info.get("trailingPe")
-        volume = info.get("volume")
-        return {
-            "eps": float(eps) if isinstance(eps, (int, float)) else None,
-            "revenue": float(revenue) if isinstance(revenue, (int, float)) else None,
-            "pe_ratio": float(pe_ratio) if isinstance(pe_ratio, (int, float)) else None,
-            "volume": float(volume) if isinstance(volume, (int, float)) else None,
+        result: Dict[str, Optional[float]] = {
+            "row_class": "row-ok",
+            "eps": None,
+            "revenue": None,
+            "pe_ratio": None,
+            "volume": None,
         }
+
+        try:
+            ticker = yf.Ticker(symbol)
+            info = ticker.info
+            eps = info.get("trailingEps") or info.get("epsTrailingEps") or info.get("epsTrailingTwelveMonths")
+            revenue = info.get("totalRevenue")
+            pe_ratio = info.get("trailingPE") or info.get("trailingPe")
+            volume = info.get("volume")
+            result.update({
+                "eps": float(eps) if isinstance(eps, (int, float)) else None,
+                "revenue": float(revenue) if isinstance(revenue, (int, float)) else None,
+                "pe_ratio": float(pe_ratio) if isinstance(pe_ratio, (int, float)) else None,
+                "volume": float(volume) if isinstance(volume, (int, float)) else None,
+            })
+        except Exception:
+            result["row_class"] = "row-error"
+
+        return result
 
 
 def get_sector_yf(symbol: str) -> Optional[str]:

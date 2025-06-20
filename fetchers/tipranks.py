@@ -32,16 +32,21 @@ class TipranksFetcher(BaseFetcher):
     proxies = load_authorized_proxies()
 
     def fetch(self, symbol: str, log_list: Optional[List[str]] = None) -> Dict[str, Optional[float]]:
+        result: Dict[str, Optional[float]] = {"tipranks": None, "row_class": "row-ok"}
         if not symbol:
-            return {"tipranks": None}
+            result["row_class"] = "row-error"
+            return result
 
         symbol = symbol.strip().lower()
         print(f"\n🔎 TipRanks for symbol: {symbol.upper()}")
 
         if not self.proxies:
             if log_list is not None and _PROXY_LOAD_ERROR:
-                log_list.append(f"{symbol} ❌ Не вдалося завантажити авторизовані проксі: {_PROXY_LOAD_ERROR}")
-            return {"tipranks": None}
+                log_list.append(
+                    f"{symbol} ❌ Не вдалося завантажити авторизовані проксі: {_PROXY_LOAD_ERROR}"
+                )
+            result["row_class"] = "row-error"
+            return result
 
         for attempt in range(len(USER_AGENTS)):
             user_agent = USER_AGENTS[TipranksFetcher.current_ua_index]
@@ -73,7 +78,8 @@ class TipranksFetcher(BaseFetcher):
                 print(f"✅ Response: {response.status_code} | UA index: {self.current_ua_index}")
 
                 if response.status_code != 200 or not response.text.strip():
-                    return {"tipranks": None}
+                    result["row_class"] = "row-error"
+                    return result
 
                 if "<html" in response.text.lower():
                     if log_list is not None:
@@ -87,7 +93,8 @@ class TipranksFetcher(BaseFetcher):
                 except json.JSONDecodeError:
                     if log_list is not None:
                         log_list.append(f"{symbol} ❌ JSON помилка")
-                    return {"tipranks": None}
+                    result["row_class"] = "row-error"
+                    return result
 
                 stocks = data.get("models", {}).get("stocks", [])
                 for stock in reversed(stocks):
@@ -96,18 +103,22 @@ class TipranksFetcher(BaseFetcher):
                         score = smart["value"]
                         if isinstance(score, (int, float)):
                             print(f"🎯 SmartScore знайдено: {score}")
-                            return {"tipranks": float(score)}
+                            result["tipranks"] = float(score)
+                            return result
 
                 if log_list is not None:
                     log_list.append(f"{symbol.upper()} ⚠️ SmartScore не знайдено")
-                return {"tipranks": None}
+                result["row_class"] = "row-error"
+                return result
 
             except Exception as e:
                 print(f"💥 Виняток: {e}")
                 self.current_ua_index = (self.current_ua_index + 1) % len(USER_AGENTS)
+                result["row_class"] = "row-error"
                 continue
 
         print("⛔ Всі спроби з UA вичерпані")
-        return {"tipranks": None}
+        result["row_class"] = "row-error"
+        return result
 
 fetch_tipranks_data = TipranksFetcher().fetch

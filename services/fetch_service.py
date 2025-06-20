@@ -33,6 +33,7 @@ def build_stock_response(
         fetched = fetcher_manager.fetch_all(symbol)
     else:
         fetched = fetcher_manager.fetch_all(symbol, log_messages)
+    row_class = fetched.pop("row_class", "row-ok")
 
     zacks_raw = fetched.get("zacks")
     zacks = int(zacks_raw) if str(zacks_raw).isdigit() else None
@@ -71,7 +72,7 @@ def build_stock_response(
         "sector": sector,
         "sector_growth": sector_growth,
         "date": today,
-        "row_class": "row-ok" if valid else "row-error",
+        "row_class": "row-ok" if valid and row_class == "row-ok" else "row-error",
     }
 
     if row_index is not None:
