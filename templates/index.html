@@ -192,6 +192,21 @@
       color: #913434;
       font-weight: bold;
     }
+
+    #console-log {
+      background-color: #1a1a1a;
+      color: #d0d0d0;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      margin-top: 16px;
+      padding: 8px 12px;
+      border: 1px solid #333;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -270,6 +285,7 @@
       <div class="status error">⚠️ Sector Growth failed</div>
     {% endif %}
   </form>
+  <div id="console-log"></div>
 
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
