@@ -1,6 +1,6 @@
 """Utility to run multiple fetchers."""
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from .zacks import ZacksFetcher
 from .tipranks import TipranksFetcher
@@ -17,12 +17,15 @@ class FetcherManager:
             YFinanceFetcher(),
         ]
 
-    def fetch_all(self, symbol: str) -> Dict:
+    def fetch_all(self, symbol: str, log_list: Optional[List[str]] = None) -> Dict:
         """Fetch data from all providers and merge the results."""
         result: Dict = {}
         for fetcher in self.fetchers:
             try:
-                data = fetcher.fetch(symbol)
+                if isinstance(fetcher, TipranksFetcher):
+                    data = fetcher.fetch(symbol, log_list)
+                else:
+                    data = fetcher.fetch(symbol)
                 if isinstance(data, dict):
                     result.update(data)
             except Exception as exc:

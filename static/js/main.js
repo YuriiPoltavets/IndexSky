@@ -16,7 +16,11 @@ async function onDataSearch(event) {
     const sector = row.querySelector('.sector-select')?.value.trim();
 
     try {
-      const data = await fetchRowData({ symbol, sector, rowIndex });
+      const response = await fetchRowData({ symbol, sector, rowIndex });
+      if (response.logs && Array.isArray(response.logs)) {
+        response.logs.forEach(line => console.log(line));
+      }
+      const data = response.data || response;
       fillRowWithData(row, data);
 
       const valid = hasRequiredFields(data);
