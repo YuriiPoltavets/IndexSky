@@ -28,17 +28,17 @@ async function onDataSearch(event) {
       if (response.logs && Array.isArray(response.logs)) {
         response.logs.forEach(line => console.log(line));
       }
-      const data = response.data || response;
-      fillRowWithData(row, data);
-  if (data.row_class === 'ok-blue') {
-    setRowStatus(row, 'ok-blue', STYLE_OK_BLUE, '🔍 OK');
-  }
-
-      const isError = data.row_class === LOGIC_ERROR;
-      if (isError) {
+      const data = response.data ?? response;
+      if (!data || !data.symbol) {
+        console.error('Invalid or empty response', response);
         setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
+        continue;
+      }
+      fillRowWithData(row, data);
+      if (data.row_class === 'ok-blue') {
+        setRowStatus(row, 'ok-blue', STYLE_OK_BLUE, '🔍 OK');
       } else {
-        setRowStatus(row, LOGIC_OK, STYLE_OK_BLUE, '🔍 OK');
+        setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
       }
     } catch (err) {
       console.error('Fetch row failed', err);
