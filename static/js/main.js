@@ -72,6 +72,8 @@ async function onDataSearch(event) {
       setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
     }
 
+    // Allow the browser to paint updated row before processing the next one
+    await new Promise(r => requestAnimationFrame(() => r()));
     await new Promise(r => setTimeout(r, FETCH_DELAY_MS));
   }
 }
