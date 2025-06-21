@@ -34,7 +34,6 @@ import {
   STYLE_OK_BLUE
 } from './constants.js';
 import { fetchRowData } from './fetchRow.js';
-import { hasRequiredFields } from './validators.js';
 import { fillRowWithData, setRowStatus, isRowEmpty } from './domUtils.js';
 
 
@@ -92,22 +91,9 @@ function handleCalculate(event) {
   const rows = Array.from(document.querySelectorAll('tbody tr'));
 
   for (const row of rows) {
-    if (isRowEmpty(row)) continue;
     if (row.dataset.status !== 'ok-blue') continue;
 
-    const data = {
-      sector: row.querySelector('.sector-select')?.value.trim(),
-      zacks: row.querySelector('.zacks-output')?.value.trim(),
-      tipranks: row.querySelector(`input[name="tipranks_${row.dataset.rowId}"]`)?.value.trim(),
-      sector_growth: row.querySelector('.sector-growth')?.value.trim()
-    };
-
-    const ok = hasRequiredFields(data);
-    if (ok) {
-      setRowStatus(row, LOGIC_OK, STYLE_SUCCESS, '✅ OK');
-    } else {
-      setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
-    }
+    setRowStatus(row, LOGIC_OK, STYLE_SUCCESS, '✅ OK');
   }
 }
 
