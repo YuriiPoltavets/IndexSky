@@ -71,7 +71,7 @@ async function onDataSearch(event) {
       console.error('Fetch row failed', err);
       setRowStatus(row, LOGIC_ERROR, STYLE_ERROR, '❌ Error');
     }
-
+    await new Promise(resolve => requestAnimationFrame(resolve));
     await new Promise(r => setTimeout(r, FETCH_DELAY_MS));
   }
 }
