@@ -93,6 +93,7 @@ function handleCalculate(event) {
 
   for (const row of rows) {
     if (isRowEmpty(row)) continue;
+    if (row.dataset.status !== 'ok-blue') continue;
 
     const data = {
       sector: row.querySelector('.sector-select')?.value.trim(),
