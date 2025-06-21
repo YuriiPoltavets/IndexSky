@@ -37,7 +37,7 @@ def test_data_search_assigns_row_class_ok():
             }
             rows = process_index_form(request)
 
-    assert rows[0]['row_class'] == 'row-ok'
+    assert rows[0]['row_class'] == 'ok-blue'
 
 
 def test_data_search_assigns_row_class_error():
